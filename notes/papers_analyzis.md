@@ -88,7 +88,27 @@ output = self.act(tf.add_n(supports) + self.vars['bias']) # Relu( h.W+ bias)
 
 
 
+![](/studies/custom_figures/adjacency_smoothing_regular_grid.png)
 
+On a regular grid, the normalized adjacency matrix is equivalent to a simple averaging in the neighborhood.
+
+On the central pixel, we get `1/5, 1/5, 1/5, 1/5 1/5` weights which is exactly the average of the neighbors.
+
+![](/studies/custom_figures/adjacency_smoothing_star.png)
+In the case of a star graph, central node feature will be mostly overriden by the whole neighborhood.
+With a star graph with $N=8$ points, the contribution of each satellite is $\frac{2}{N}$ where the central node 
+only gets to keeps $\frac{1}{N} his feature. 
+
+```python
+[[0.125 0.25  0.25  0.25  0.25  0.25  0.25  0.25 ]
+ [0.25  0.5   0.    0.    0.    0.    0.    0.   ]
+ [0.25  0.    0.5   0.    0.    0.    0.    0.   ]
+ [0.25  0.    0.    0.5   0.    0.    0.    0.   ]
+ [0.25  0.    0.    0.    0.5   0.    0.    0.   ]
+ [0.25  0.    0.    0.    0.    0.5   0.    0.   ]
+ [0.25  0.    0.    0.    0.    0.    0.5   0.   ]
+ [0.25  0.    0.    0.    0.    0.    0.    0.5  ]]
+```
 ----------
 
 #### Modifying the graph regularity pargadim
