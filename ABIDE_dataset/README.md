@@ -4,9 +4,13 @@ ABIDE  database [[2]](#2) is one of the dataset used by the author of the studie
 
 
 ## What are the data ?
-Even if preprocessed fMRI images are available, those files are very large, i.e. ~100 Mo each. However, the extracted time series files are ~200Ko in size for each subject. We downloaded *rois-ho.1D* files which are time series extracted from Harvard-Oxford (HO) atlas. 
+Even if preprocessed fMRI images are available, those files are very large, i.e. ~100 Mo each. However, the extracted time series files are ~200Ko in size for each subject. We downloaded *rois-ho.1D* files which are time series extracted from [Harvard-Oxford (HO) atlas](https://nilearn.github.io/dev/auto_examples/01_plotting/plot_atlas.html#visualizing-the-harvard-oxford-atlas). 
 
-In medical imaging, time series are a collection of data points that are recorded or measured over a period of time. In the cas of fMRI, time series represent the intensity of brain activity within various regions at different time points as the MRI scanner captures images over time. The HO atlas is a set of anatomical brain regions or regions of interest (ROIs) that have been defined and labeled based on the human brain's anatomical structures.
+
+![](/ABIDE_dataset/figures/HO_atlas.png)
+
+In medical imaging, time series are a collection of data points that are recorded or measured over a period of time. In the case of fMRI, time series represent the intensity of brain activity within various regions at different time points as the MRI scanner captures images over time.
+> The HO atlas is a set of anatomical brain regions or regions of interest (ROIs) that have been defined and labeled based on the human brain's anatomical structures.
 
 Here, the time series data is derived from the specific regions defined in the HO atlas. In our code, they are numpy array of size (timepoints x regions), here it is (196 x 111).
 
@@ -20,18 +24,22 @@ Like the authors [[1]](#1), we use *nilearn* to preprocess the data by specifyin
 The following tuto enables you to download preprocessed extracted time series and the connectivity matrix associated with each patient. Note that, in this context, the connectivity matrix is a matrix of a connectivity measure (e. g. Pearson's correlation) between two time series of the brain activity of a subject. Its size is, thereby, (number of regions x number of regions).
 
 1. activate the virtual environment .venv
-2. copy paste the following commant in the terminal :
+2. copy paste the following command in the terminal :
+> :warning: USE ABSOLUTE PATHS (**not relative paths**) :warning:
 ```
 python download_preprocess.py -o "path/to/data"
 ```
-If you want to load less data (e.g. 400) than the default value (871), you can type in :
+If you want to load less data (e.g. `-n 400`) than the default value (871), you can type in :
 ```
 python download_preprocess.py -o "path/to/data" -n 400
-
 ```
 
+
 ## How are the feature vectors computed ?
-*Recursive feature elimination* (RFE) with scikit learn: Given an external estimator (here, a Ridge Classifier) that assigns weights to features, the goal of RFE is to select features by recursively considering smaller and smaller sets of features. First, the estimator is trained on the initial set of features and the importance of each feature is obtained through any specific attribute. Then, the least important features are pruned from current set of features. That procedure is recursively repeated until the desired number of features to select is eventually reached.
+*Recursive feature elimination* (RFE) with scikit learn: 
+- Given an external estimator (here, a Ridge Classifier) that assigns weights to features, the goal of RFE is to select features by recursively considering smaller and smaller sets of features.
+- First, the estimator is trained on the initial set of features and the importance of each feature is obtained through any specific attribute. Then, the least important features are pruned from current set of features. 
+- That procedure is recursively repeated until the desired number of features to select is eventually reached.
 
 **Fisher transformed Pearson's correlation coefficient**
 

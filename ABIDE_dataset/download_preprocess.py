@@ -65,11 +65,12 @@ if __name__ == "__main__":
 
     # Selected pipeline
     pipeline = 'cpac'
+    strategy = 'filt_noglobal'
 
     # Input data variables
     num_subjects = args.nb_subjects # Number of subjects
     root_folder =  args.out_dir #'/path/to/data/'
-    data_folder = os.path.join(root_folder, 'ABIDE_pcp/cpac/filt_noglobal')
+    data_folder = os.path.join(root_folder, 'ABIDE_pcp', pipeline, strategy)
 
     # Files to fetch
     files = ['rois_ho']
