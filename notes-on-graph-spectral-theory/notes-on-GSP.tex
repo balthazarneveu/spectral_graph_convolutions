@@ -1,0 +1,89 @@
+\documentclass[sigconf]{acmart}
+
+\input{shortcuts.sty}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+\begin{document}
+
+\title{Notes on Graph Spectral Theory}
+
+\maketitle
+
+\section{The main challenges of signal processing on graphs} 
+
+Graphs are widely used thanks to their generic data representation forms which are useful for describing the geometric structures of data domains in very different application fields, including social, energy, transportation, and brain modelisation.
+However, classical tools and techniques from signal processing can not be used seamlessly/candidly on graphs unlike audio signal and images \cite{shuman_emerging_2013}.
+
+\begin{itemize}
+    \item Graphs have no inherent ordering of the vertices, unlike images where pixel is uniquely identified by its position within the image. We therefore need algorithms that are node-order equivariant: they should not depend on the ordering of the nodes.
+    \item Many graphs are irregular structures that lack a shift-invariant notion of translation, which is a key property of the Fourier transform \cite{daigavane_understanding_2021}.
+    \item The analogous spectrum in the graph setting is discrete and irregularly spaced, and it is therefore non-trivial to define an operator that correspond to translation in the graph spectral domain.
+    \item We may need to downsample a graph, and therefore we need a method to generate a coarser version of the graph that somehow captures the structural properties embedded in the original graph.
+    \item We need localized transforms that compute information about the data at each vertex by using data from a small neighbourhood of vertices close to it in the graph
+\end{itemize}
+Graphs can also be very large but, in our study, we consider sparse population graphs, \ie individuals or nodes are connected to a limited number of nodes/number of edges is linear in the number of nodes.
+Spectral graph theory has enabled constructing, analyzing, and manipulating graphs.
+
+In signal processing on graphs, it is leveraged as a tool to define frequency spectra and expansion bases for graph Fourier transforms.
+
+In this section, we present some basic definitions from spectral graph theory that will be needed to apply neural networks on graphs. As stated previously, we consider an undirected, connected, weighted graph $\mathcal{G} = \{\mathcal{V}, \mathcal{E}, \mathbf{W}\}$. 
+
+\section{The non-normalized and normalized Graph Laplacian}
+The \textbf{non-normalized graph Laplacian}, also called the combinatorial graph Laplacian, is defined 
+as $\mathbf{L} = \mathbf{D}-\mathbf{W}$, where the degree matrix $\mathbf{D}$ 
+is a diagonal matrix 
+whose $i$th diagonal element, $d_i$, is equal to the sum of the weights of all edges incident to vertex $i$
+(e.g. the sum over the rows of ${W}$).
+%The graph Laplacian is a difference operator defined for any signal $f$, as follows :
+%$$
+%(\mathbf{L}f)(i) = \sum_{j\in\mathcal{N}_i} W_{i, j}[f(i) - f(j)]
+%$$
+%where $\mathcal{N}_i$ is the set of vertices connected to vertex $i$ by an edge.
+
+The graph Laplacian $\mathbf{L}$ is a real symmetric matrix, it has therefore real, non-negative eigenvalues $\{\lambda_l\}_{l=0, \dots, N-1}$. 
+We denote their associated  orthonormal eigenvectors by $\{u_l\}_{l=0,\dots, N-1}$, %so that $\mathbf{L}u_l = \lambda 
+
+Since we consider connected graphs, the eigenvalue $\lambda_0=0$ has multiplicity $1$  \cite{shuman_emerging_2013}. 
+\textit{(There are as many null eigen values as there are connected components in the graph.)}
+
+A popular practice is to normalize each weight $W_{i, j}$ by a factor of $\frac{1}{\sqrt{d_id_j}}$.
+Doing so leads to the \textbf{normalized graph Laplacian}, which is defined as $\tilde{\mathbf{L}} = D^{-1/2}\mathbf{L}D^{-1/2} = I_N - D^{-1/2}\mathbf{W}D^{-1/2}$
+
+\textit{Note that the rows of  $\tilde{\mathbf{L}}$ do not sum to zero, unlike the rows of $\mathbf{L}$}.
+
+
+\section{A Graph Fourier Transform and Notion of Frequency}
+The Fourier transform for analogous function $f$
+$$
+\hat{f}(\xi) = \sca{f}{e^{2\pi i\xi t}} = \int_{\RR} f(t)e^{-2\pi i \xi t}dt
+$$
+is the expansion of a function $f$ in terms of the complex exponentials, which are the eigenfunctions of the one-dimensional Laplace operator $\Delta$ :
+$$
+-\Delta (e^{2\pi i \xi t}) = -\frac{\partial^2}{\partial t^2} e^{2\pi i \xi t} = (2\pi i\xi)^2 e^{2\pi i \xi t}
+$$
+Similarly, we can define the \textit{Graph Fourier Transform} $\hat{f}$ of any function on the vertices of $\GG$ as the expansion of $f$ in terms of the eigenvectors of the graph Laplacian :
+\begin{equation}
+    \hat{f}(\lambda_l) = \sca{f}{u_l} = \sum_{i=1}^{N} f(i)u_l^*(i)
+\end{equation}
+where $u_l^*(i)$ is the conjugate of $u_l(i)$.
+The \textit{inverse graph Fourier transform} is then given by 
+\begin{equation}
+    f(i) = \sum_{i=1}^{N} \hat{f}(\lambda_i)u_l(i)
+\end{equation}
+
+Note that, in our case, the signal is $f:\mathcal{V}\rightarrow\RR^N$ that associate a feature vector to each node of the graph.
+
+\section{Spectral Graph Convolutions }
+
+We consider spectral convol \cite{kipf_semi-supervised_2017}
+polynomials of Laplacian of degree $d$ : the node $v$ is convolved with nodes that are at most at a distance $d$. Thus, these polynomials filters are localized.
+\section{A simple application}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+\end{document}
