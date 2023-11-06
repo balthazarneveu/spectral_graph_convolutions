@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{3}
+\begin{thebibliography}{5}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -49,6 +49,18 @@
 \showDOI{\tempurl}
 
 
+\bibitem[Hammond et~al\mbox{.}({[n.\,d.]})]%
+        {hammond_wavelets_2011}
+\bibfield{author}{\bibinfo{person}{David~K. Hammond}, \bibinfo{person}{Pierre Vandergheynst}, {and} \bibinfo{person}{RÃ©mi Gribonval}.} \bibinfo{year}{[n.\,d.]}\natexlab{}.
+\newblock \showarticletitle{Wavelets on graphs via spectral graph theory}.
+\newblock  \bibinfo{volume}{30}, \bibinfo{number}{2} (\bibinfo{year}{[n.\,d.]}), \bibinfo{pages}{129--150}.
+\newblock
+\showISSN{10635203}
+\urldef\tempurl%
+\url{https://doi.org/10.1016/j.acha.2010.04.005}
+\showDOI{\tempurl}
+
+
 \bibitem[Kipf and Welling({[n.\,d.]})]%
         {kipf_semi-supervised_2017}
 \bibfield{author}{\bibinfo{person}{Thomas~N. Kipf} {and} \bibinfo{person}{Max Welling}.} \bibinfo{year}{[n.\,d.]}\natexlab{}.
@@ -60,6 +72,14 @@
 \url{http://arxiv.org/abs/1609.02907}
 \showURL{%
 \tempurl}
+
+
+\bibitem[Parisot et~al\mbox{.}(2017)]%
+        {Parisot17}
+\bibfield{author}{\bibinfo{person}{Sarah Parisot}, \bibinfo{person}{Sofia~Ira Ktena}, \bibinfo{person}{Enzo Ferrante}, \bibinfo{person}{Matthew Lee}, \bibinfo{person}{Ricardo~Guerrerro Moreno}, \bibinfo{person}{Ben Glocker}, {and} \bibinfo{person}{Daniel Rueckert}.} \bibinfo{year}{2017}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{"Spectral Graph Convolutions for Population-Based Disease Prediction"}}.
+\newblock
+\showISBNx{978-3-319-66179-7}
 
 
 \bibitem[Shuman et~al\mbox{.}({[n.\,d.]})]%

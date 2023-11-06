@@ -1,6 +1,6 @@
 # Application to ABIDE Dataset
 
-ABIDE  database [[2]](#2) is one of the dataset used by the author of the studied article. It is freely provided py the [Preprocessed Connectome Project](http://preprocessed-connectomes-project.org/abide/) initiative and can be downloaded and prepocessed using the Python package [*nilearn*](https://nilearn.github.io/dev/introduction.html#what-is-nilearn) which allows users to apply machine learning techniques to analyse data acquired with MRI machines. 
+ABIDE  database [[2]](#2) is one of the dataset used by the authors of the studied article. It is freely provided by the [Preprocessed Connectome Project](http://preprocessed-connectomes-project.org/abide/) initiative and can be downloaded and prepocessed using the Python package [*nilearn*](https://nilearn.github.io/dev/introduction.html#what-is-nilearn) which allows users to apply machine learning techniques to analyse data acquired with MRI machines. 
 
 
 ## What are the data ?
