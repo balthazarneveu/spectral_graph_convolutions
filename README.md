@@ -27,3 +27,15 @@ Student project on [Spectral Graph Convolutions for Population-based Disease Pre
 
 ### Studies
 - [Normalized adjacency matrix](/studies/normalized_adjacency.py) : getting familiar with the $D^{-\frac{1}{2}} A D^{-\frac{1}{2}}$ matrix  *(by  [Balthazar Neveu](https://github.com/balthazarneveu))* based on [NetworkX](https://networkx.org/).
+
+
+
+-----------
+### Getting started
+
+```bash
+git clone git@github.com:balthazarneveu/sprectral_graph_convolutions.git
+python3 ABIDE_dataset/download_preprocess.py
+```
+- Clone repository
+- Download ABIDE dataset to the default location `__ABIDE_dataset`
