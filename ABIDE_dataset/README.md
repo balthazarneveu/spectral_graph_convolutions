@@ -30,7 +30,11 @@ The previous command enables you to download preprocessed extracted time series 
 
 A [visualization notebook](/ABIDE_dataset/visualize_data.ipynb) is available aswell.
 
-
+| ABIDE dataset - Time series | ABIDE dataset - Connectivity matrices |
+|:-----: |:-----:|
+| ![time_series](/ABIDE_dataset/figures/separate_time_series.png) | ![connectivity_matrix](/ABIDE_dataset/figures/connectivity_matrix.png) |
+| ![time_series](/ABIDE_dataset/figures/separate_time_series_other.png) | ![connectivity_matrix](/ABIDE_dataset/figures/connectivity_matrix_other.png) |
+| Time series look impossible to compare accross patients| For each patient, connectivity matrix looks much more structured and informative|
 
 ### Connectivity matrices
 
