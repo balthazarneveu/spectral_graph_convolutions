@@ -46,7 +46,7 @@ whose $i$th diagonal element, $d_i$, is equal to the sum of the weights of all e
 %where $\mathcal{N}_i$ is the set of vertices connected to vertex $i$ by an edge.
 
 The graph Laplacian $\mathbf{L}$ is a real symmetric matrix, it has therefore real, non-negative eigenvalues $\{\lambda_l\}_{l=0, \dots, N-1}$. 
-We denote their associated  orthonormal eigenvectors by $\{u_l\}_{l=0,\dots, N-1}$, %so that $\mathbf{L}u_l = \lambda 
+We denote their associated  orthonormal eigenvectors by $\{u_l\}_{l=0,\dots, N-1}$. In the following, $\Lambda$ and $U$ denote the diagonal matrix of eigenvalues and the matrix of eigenvectors, respectively.
 
 Since we consider connected graphs, the eigenvalue $\lambda_0=0$ has multiplicity $1$  \cite{shuman_emerging_2013}. 
 \textit{(There are as many null eigen values as there are connected components in the graph.)}
@@ -66,22 +66,35 @@ is the expansion of a function $f$ in terms of the complex exponentials, which a
 $$
 -\Delta (e^{2\pi i \xi t}) = -\frac{\partial^2}{\partial t^2} e^{2\pi i \xi t} = (2\pi i\xi)^2 e^{2\pi i \xi t}
 $$
-Similarly, we can define the \textit{Graph Fourier Transform} $\hat{f}$ of any function on the vertices of $\GG$ as the expansion of $f$ in terms of the eigenvectors of the graph Laplacian :
+Similarly, we can define the \textit{Graph Fourier Transform} $\hat{f}$ of any function on the vertices of $\GG$ as the expansion of $f$ in terms of the eigenvectors of the graph Laplacian $\hat{f}(\lambda_l) = \sca{f}{u_l} = \sum_{i=1}^{N} f(i)u_l^*(i)$ : 
+where $u_l^*(i)$ is the conjugate of $u_l(i)$ : 
 \begin{equation}
-    \hat{f}(\lambda_l) = \sca{f}{u_l} = \sum_{i=1}^{N} f(i)u_l^*(i)
+    \hat{f} = U^Tf
 \end{equation}
-where $u_l^*(i)$ is the conjugate of $u_l(i)$.
-The \textit{inverse graph Fourier transform} is then given by 
+
+The \textit{inverse graph Fourier transform} is then given by $f(i) = \sum_{i=1}^{N} \hat{f}(\lambda_i)u_l(i)$ : 
 \begin{equation}
-    f(i) = \sum_{i=1}^{N} \hat{f}(\lambda_i)u_l(i)
+    f = U\hat{f}
 \end{equation}
 
 Note that, in our case, the signal is $f:\mathcal{V}\rightarrow\RR^N$ that associate a feature vector to each node of the graph.
 
 \section{Spectral Graph Convolutions }
 
-We consider spectral convol \cite{kipf_semi-supervised_2017}
+Spectral convolution of the signal $f$ with a filter $g_\theta$ is defined as $g_\theta * f = g_\theta(\widetilde{L})f = Ug_\theta(\Lambda)U^Tf = U g_\theta(\Lambda)\hat{f}$. 
+Indeed, we recover the property that the convolution in the vertex domain is equivalent to a multiplication in the graph spectral domain.
+
+Polynomial filters, defined as $g_\theta(\Lambda) = \sum_{k=0}^{K-1}\theta_k\Lambda^k$, are commonly used in localized convolutions. Those filters are localized thanks to the lemma 5.2 in \cite{hammond_wavelets_2011}. We can show that for some interger $s$ and for any 
+vertices $m$ and $n$ in the graph $\GG$, if $d_\GG(m, n) > s$ then $(L^s)_{m, n} = 0$. $d_\GG(m, n)$ denotes the number of edges in the shortest path connecting the nodes $m$ and $n$.
+It follows that a $K$-order polynomial filter is strictly $K$-localized, \ie it only depends on the $K$-hop neighbourhood of each vertex. In \cite{Parisot17}, the authors chose $K=3$\\ 
+Futhermore, such filters can be well approximated by a truncated Chebyshev expansion of the form $g_\theta(\widetilde{L}) = \sum_{k=0}^{K-1}\theta_kT_k(\widetilde{L})$ where $T_k$ is the $k$th Chebyshev polynomial of the first kind.
+\begin{lemma}
+    In the appropriate Sobolev space, the set of Chebyshev polynomials form an orthonormal basis, so that a function in the same space can, on $-1\leq x \leq 1$, be expressed via the expansion : $$g(x) = \sum_{n=0}^{\infty} a_nT_n(x)$$.
+\end{lemma}
+This decomposition significantly reduces the computational complexity of the convolution operator.
+\cite{kipf_semi-supervised_2017}
 polynomials of Laplacian of degree $d$ : the node $v$ is convolved with nodes that are at most at a distance $d$. Thus, these polynomials filters are localized.
+
 \section{A simple application}
 
 \bibliographystyle{ACM-Reference-Format}
