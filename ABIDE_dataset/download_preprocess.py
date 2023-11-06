@@ -8,7 +8,7 @@ import shutil
 import numpy as np
 import ABIDE_graph as Reader
 from pathlib import Path
-from config import DEFAULT_ABIDE_ROOT_LOCATION
+from config import DEFAULT_ABIDE_ROOT_LOCATION, PIPELINE, STRATEGY, ABIDE_PCP, ATLAS_NAME
 
 # Get the list of subject IDs
 def get_ids(data_folder, num_subjects=None):
@@ -65,14 +65,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Selected pipeline
-    pipeline = 'cpac'
-    strategy = 'filt_noglobal'
+
 
     # Input data variables
     num_subjects = args.nb_subjects # Number of subjects
-    root_folder =  args.out_dir #'/path/to/data/'
+    root_folder =  args.out_dir
     root_folder = Path(root_folder).absolute()
-    data_folder = root_folder/ 'ABIDE_pcp'/ pipeline/ strategy
+    data_folder = root_folder/ ABIDE_PCP/ PIPELINE/ STRATEGY
     data_folder.mkdir(parents=True, exist_ok=True)
     subject_list = Path(__file__).parent/'subject_IDs.txt'
     assert subject_list.exists(), f"no file {subject_list}"
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     # shutil.copyfile('./subject_IDs.txt', os.path.join(data_folder, 'subject_IDs.txt'))
 
     # Download database files
-    abide = datasets.fetch_abide_pcp(data_dir=root_folder, n_subjects=num_subjects, pipeline=pipeline,
+    abide = datasets.fetch_abide_pcp(data_dir=root_folder, n_subjects=num_subjects, pipeline=PIPELINE,
                                     band_pass_filtering=True, global_signal_regression=False, derivatives=files)
 
 
@@ -111,7 +110,7 @@ if __name__ == "__main__":
                 shutil.move(base + filemapping[fl], subject_folder)
 
     # Compute and save connectivity matrices
-    time_series = Reader.get_timeseries(data_folder=data_folder, subject_list=subject_IDs, atlas_name='ho')
+    time_series = Reader.get_timeseries(data_folder=data_folder, subject_list=subject_IDs, atlas_name=ATLAS_NAME)
     for i in range(len(subject_IDs)):
-            Reader.compute_subject_connectivity(time_series[i], subject_IDs[i], 'ho', 'correlation', save_path=data_folder)
+            Reader.compute_subject_connectivity(time_series[i], subject_IDs[i], ATLAS_NAME, 'correlation', save_path=data_folder)
 
