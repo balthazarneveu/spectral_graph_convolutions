@@ -7,7 +7,8 @@ import os
 import shutil
 import numpy as np
 import ABIDE_graph as Reader
-
+from pathlib import Path
+from config import DEFAULT_ABIDE_ROOT_LOCATION, PIPELINE, STRATEGY, ABIDE_PCP, ATLAS_NAME
 
 # Get the list of subject IDs
 def get_ids(data_folder, num_subjects=None):
@@ -59,30 +60,35 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description='Download preprocessed datain chosen directory')
-    parser.add_argument('-o', '--out_dir', required=True, type=str, help='Path to local folder to download files to')
-    parser.add_argument('-n', '--nb_subjects', type=int, default=871, help='Number of data/subject to download')
+    parser.add_argument('-o', '--out-dir', default=str(DEFAULT_ABIDE_ROOT_LOCATION), type=str, help='Path to local folder to download files to')
+    parser.add_argument('-n', '--nb-subjects', type=int, default=871, help='Number of data/subject to download')
     args = parser.parse_args()
 
     # Selected pipeline
-    pipeline = 'cpac'
-    strategy = 'filt_noglobal'
+
 
     # Input data variables
     num_subjects = args.nb_subjects # Number of subjects
-    root_folder =  args.out_dir #'/path/to/data/'
-    data_folder = os.path.join(root_folder, 'ABIDE_pcp', pipeline, strategy)
-
+    root_folder =  args.out_dir
+    root_folder = Path(root_folder).absolute()
+    data_folder = root_folder/ ABIDE_PCP/ PIPELINE/ STRATEGY
+    data_folder.mkdir(parents=True, exist_ok=True)
+    subject_list = Path(__file__).parent/'subject_IDs.txt'
+    assert subject_list.exists(), f"no file {subject_list}"
+    shutil.copy(subject_list, data_folder)
+    root_folder = str(root_folder)
+    data_folder = str(data_folder)
     # Files to fetch
     files = ['rois_ho']
 
     filemapping = {'func_preproc': 'func_preproc.nii.gz', # to you use for fMRI images
                 'rois_ho': 'rois_ho.1D'}
 
-    if not os.path.exists(data_folder): os.makedirs(data_folder)
-    shutil.copyfile('./subject_IDs.txt', os.path.join(data_folder, 'subject_IDs.txt'))
+
+    # shutil.copyfile('./subject_IDs.txt', os.path.join(data_folder, 'subject_IDs.txt'))
 
     # Download database files
-    abide = datasets.fetch_abide_pcp(data_dir=root_folder, n_subjects=num_subjects, pipeline=pipeline,
+    abide = datasets.fetch_abide_pcp(data_dir=root_folder, n_subjects=num_subjects, pipeline=PIPELINE,
                                     band_pass_filtering=True, global_signal_regression=False, derivatives=files)
 
 
@@ -104,7 +110,7 @@ if __name__ == "__main__":
                 shutil.move(base + filemapping[fl], subject_folder)
 
     # Compute and save connectivity matrices
-    time_series = Reader.get_timeseries(data_folder=data_folder, subject_list=subject_IDs, atlas_name='ho')
+    time_series = Reader.get_timeseries(data_folder=data_folder, subject_list=subject_IDs, atlas_name=ATLAS_NAME)
     for i in range(len(subject_IDs)):
-            Reader.compute_subject_connectivity(time_series[i], subject_IDs[i], 'ho', 'correlation', save_path=data_folder)
+            Reader.compute_subject_connectivity(time_series[i], subject_IDs[i], ATLAS_NAME, 'correlation', save_path=data_folder)
 

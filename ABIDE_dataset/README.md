@@ -21,18 +21,20 @@ Like the authors [[1]](#1), we use *nilearn* to preprocess the data by specifyin
 
 ## How to download those data ?
 
-The following tuto enables you to download preprocessed extracted time series and the connectivity matrix associated with each patient. Note that, in this context, the connectivity matrix is a matrix of a connectivity measure (e. g. Pearson's correlation) between two time series of the brain activity of a subject. Its size is, thereby, (number of regions x number of regions).
+:+1: :rocket: All you have to do here , from the root of the project
+```
+python ABIDE_dataset/download_preprocess.py
+```
 
-1. activate the virtual environment .venv
-2. copy paste the following command in the terminal :
-> :warning: USE ABSOLUTE PATHS (**not relative paths**) :warning:
-```
-python download_preprocess.py -o "path/to/data"
-```
-If you want to load less data (e.g. `-n 400`) than the default value (871), you can type in :
-```
-python download_preprocess.py -o "path/to/data" -n 400
-```
+The previous command enables you to download preprocessed extracted time series and the connectivity matrix associated with each patient. Note that, in this context, the connectivity matrix is a matrix of a connectivity measure (e. g. Pearson's correlation) between two time series of the brain activity of a subject. Its size is, thereby, (number of regions x number of regions).
+
+A [visualization notebook](/ABIDE_dataset/visualize_data.ipynb) is available aswell.
+
+| ABIDE dataset - Time series | ABIDE dataset - Connectivity matrices |
+|:-----: |:-----:|
+| ![time_series](/ABIDE_dataset/figures/separate_time_series.png) | ![connectivity_matrix](/ABIDE_dataset/figures/connectivity_matrix.png) |
+| ![time_series](/ABIDE_dataset/figures/separate_time_series_other.png) | ![connectivity_matrix](/ABIDE_dataset/figures/connectivity_matrix_other.png) |
+| Time series look impossible to compare accross patients| For each patient, connectivity matrix looks much more structured and informative|
 
 ### Connectivity matrices
 
@@ -59,7 +61,8 @@ Sort of shows how two parts of the brain are related or not to each other.
 - another way to classify the subject ?
 
 
----
+
+
 <a id="f1">1</a> A connectome is a functional-connectivity matrix between a set of brain regions of interest (ROIs). [↩](#s1)
 
 
@@ -70,3 +73,22 @@ Sort of shows how two parts of the brain are related or not to each other.
 <a id="1"> [1] </a> S. Parisot et al., ‘Spectral Graph Convolutions for Population-based Disease Prediction’. arXiv, Jun. 21, 2017. doi: 10.48550/arXiv.1703.03020.
 
 <a id="data"> [2] </a> Cameron Craddock, Yassine Benhajali, Carlton Chu, Francois Chouinard, Alan Evans, András Jakab, Budhachandra Singh Khundrakpam, John David Lewis, Qingyang Li, Michael Milham, Chaogan Yan, Pierre Bellec (2013). The Neuro Bureau Preprocessing Initiative: open sharing of preprocessed neuroimaging data and derivatives. In Neuroinformatics 2013, Stockholm, Sweden.
+
+
+
+
+### Custom path
+-----
+:warning: Custom path - not recommended :warning: 
+1. activate the virtual environment .venv
+2. `cd ABIDE_dataset`
+3. copy paste the following command in the terminal:
+
+```
+python download_preprocess.py -o "path/to/data"
+```
+If you want to load less data (e.g. `-n 400`) than the default value (871), you can type in :
+```
+python download_preprocess.py -o "path/to/data" -n 400
+```
+---
