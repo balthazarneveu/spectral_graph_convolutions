@@ -1,6 +1,22 @@
 # Papers analyzis
+Defining convolutions on graph.
 
-## [Kipf2017](/external/papers/Kipf2017_8.pdf) SEMI-SUPERVISED CLASSIFICATION WITH GRAPH CONVOLUTIONAL NETWORKS
+- [Convolution theorem](https://en.wikipedia.org/wiki/Convolution_theorem): under suitable conditions, the Fourier transform of a convolution of two functions is the pointwise product of their Fourier transforms. 
+- On graph,
+
+|                        | Regular grids          |        Graph                     |
+|:----------------------:|:----------------------:|:--------------------------------:|
+| Laplacian              |                        | $\tilde{L} = U \Lambda U^T$      |
+| Fourier transform      |  $\hat{f}(\xi) = \int_{\R} f(t)e^{-2\pi i \xi t}dt$           | $\hat{f}(\lambda_i) = U^T .f$ |
+| Spatial convolution    | $g * f$                |  |
+| Spectral convolution   | $\hat{g} \odot \hat{f}$ | $\Theta_i * \Lambda_i$|
+
+## \[[Deﬀerrard 2016](/external/papers/Deﬀerrard2016_4.pdf)\] CONVOLUTIONAL NEURAL NETWORKS ON GRAPHS WITH FAST LOCALIZED SPECTRAL FILTERING (ChebConv)
+
+
+
+
+## \[[Kipf2017](/external/papers/Kipf2017_8.pdf)\] SEMI-SUPERVISED CLASSIFICATION WITH GRAPH CONVOLUTIONAL NETWORKS
 
 
 [Clear and illustrated explanation](https://tkipf.github.io/graph-convolutional-networks/)
