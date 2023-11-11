@@ -73,7 +73,7 @@ def draw_weighted_graph(G: nx.Graph, node_features: dict = None, fname: str = No
     fig.savefig(fname, bbox_inches='tight') # bbox_inches='tight' to avoid the labels being clipped
 
 
-def compute_graph_convolution(G, K=1, out_channels=2, normalization='sym', initialization=None):
+def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, normalization: str ='sym', initialization: str =None):
     """
     Parameters:
     ----------
