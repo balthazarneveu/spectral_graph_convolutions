@@ -6,3 +6,5 @@
 *.gz
 *.xsim
 *.synctex.gz
+*.bbl
+*.blg
