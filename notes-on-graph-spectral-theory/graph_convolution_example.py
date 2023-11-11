@@ -1,11 +1,24 @@
 import networkx as nx
+import numpy as np
+#from scipy.sparse import diags, eye
 import matplotlib.pyplot as plt
-from random import choice, random
+from config import DEFAULT_FIGURES_LOCATION
 
 import torch
 from torch_geometric.nn import ChebConv
 
-def create_simple_graph(nbNodes=5):
+def compute_graph_laplacian(graph: nx.Graph) -> np.ndarray:
+    """
+    D^-1/2 W D^-1/2
+    """
+
+    W = nx.adjacency_matrix(graph).toarray() # (|V|, |V|)
+    deg = np.sum(W, axis=1) 
+    D = np.diag(np.sqrt(1./deg))
+
+    return D@W@D
+
+def create_simple_graph() -> nx.Graph:
     G = nx.Graph()
     #G.add_nodes_from(range(nbNodes))
     #random_position = list(range(nbNodes))
@@ -18,24 +31,25 @@ def create_simple_graph(nbNodes=5):
         G.add_node(i, feat=[i])
         G.add_edge(rd_node, i, weight=rd_weight) """
     
-    G.add_edge(0, 1, weight=0.6)
-    G.add_edge(0, 2, weight=0.2)
-    G.add_edge(2, 3, weight=0.1)
+    G.add_edge(0, 1, weight=.6)
+    G.add_edge(0, 2, weight=.2)
+    G.add_edge(2, 3, weight=.1)
     G.add_edge(2, 4, weight=0.7)
     G.add_edge(2, 5, weight=0.9)
     G.add_edge(0, 3, weight=0.3)
 
     # add node features
-    G.nodes[0]["feat"] = [1]
-    G.nodes[1]["feat"] = [2]
-    G.nodes[2]["feat"] = [3]
-    G.nodes[3]["feat"] = [4]
-    G.nodes[4]["feat"] = [5]
-    G.nodes[5]["feat"] = [6]
+    G.nodes[0]["feat"] = [4]
+    G.nodes[1]["feat"] = [5]
+    G.nodes[2]["feat"] = [2]
+    G.nodes[3]["feat"] = [2]
+    G.nodes[4]["feat"] = [3]
+    G.nodes[5]["feat"] = [3]
 
     return G
 
-def draw_weighted_graph(G, node_features=None):
+def draw_weighted_graph(G: nx.Graph, node_features: dict = None, fname: str = None):
+    fig = plt.figure() # figsize=(8, 8)
 
     # ---Visualization 
     pos = nx.spring_layout(G, seed=7) # positions for all nodes - seed for reproducibility
@@ -45,7 +59,7 @@ def draw_weighted_graph(G, node_features=None):
     # node feature
     if node_features is None:
         node_features = nx.get_node_attributes(G, "feat")
-        print('get node featurex nx', node_features)
+    print('node_features', node_features)
     nx.draw_networkx_labels(G, pos, labels=node_features) #font_size=20, font_family="sans-serif") # node labels
     
     # edge weight labels
@@ -56,16 +70,20 @@ def draw_weighted_graph(G, node_features=None):
     ax.margins(0.08) # to avoid the nodes being clipped
     plt.axis("off") # to turn of the axis
     plt.tight_layout() # to make sure nothing gets clipped
-    plt.show()
+    fig.savefig(fname, bbox_inches='tight') # bbox_inches='tight' to avoid the labels being clipped
 
-def compute_graph_convolution(graph, K=1, out_channels=2, normalization='sym'):
+
+def compute_graph_convolution(G, K=1, out_channels=2, normalization='sym', initialization=None):
+    """
+    Parameters:
+    ----------
+    G: networkx graph
+    """
+
     # get graph dim
     edge_weights = torch.tensor([G[u][v]['weight'] for u, v in G.edges()], dtype=torch.float32) # (|E|, )
-    print('weights', edge_weights.size())
     node_features = torch.tensor([G.nodes[i]['feat'] for i in G.nodes()], dtype=torch.float32) # (|V|, feat_dim)
-    print('node_features', node_features.size())
     edge_indices = torch.tensor([e for e in G.edges()], dtype=torch.int64).permute(1, 0) # (2, |E|) 
-    print('edge_indices', edge_indices.size())
 
     # compute graph convolution
     conv = ChebConv(
@@ -73,24 +91,31 @@ def compute_graph_convolution(graph, K=1, out_channels=2, normalization='sym'):
         out_channels=out_channels, K=K,
         normalization=normalization
         )
+    
+    # initialize weights
+    if initialization is not None:
+        init = eval(f"torch.nn.init.{initialization}_")
+        for lins in conv.lins:
+            init(lins.weight)
 
     out = conv(node_features, edge_indices, edge_weights) # (|V|, out_channels)
-    print('out', out.size())
     return out
 
 
 if __name__ == '__main__':
+    K=3
     G = create_simple_graph()
-    #draw_weighted_graph(G)
-    out = compute_graph_convolution(G, K=1, normalization='sym')
-    node_features_after_conv = {i: torch.round(out[i]).tolist() for i in range(len(out))}
-    print('node_features_after_conv', node_features_after_conv)
-    draw_weighted_graph(G, node_features=node_features_after_conv)
+    draw_weighted_graph(G, fname=f"{DEFAULT_FIGURES_LOCATION}/toy_graph_init.png")
+    # print graph
+    norm_lap = compute_graph_laplacian(G)
+    print('lap', norm_lap)
+    print(norm_lap@norm_lap)
+    print(norm_lap@norm_lap@norm_lap)
 
-    #node_feat = torch.tensor([v for v in node_features.values()])
-    #node_features = torch.tensor([G.nodes[i]['feat'] for i in G.nodes()])
-    #print(node_feat.size())
-    #weights = torch.tensor([w for w in edge_weights.values()])
-    #print(weights.size())
+    out_conv = compute_graph_convolution(G, K=K, out_channels=1, normalization='sym', initialization="ones")
+    node_features_after_conv = {i: torch.round(out_conv[i]).tolist() for i in range(len(out_conv))}
+    print('node_features_after_conv', node_features_after_conv)
+    draw_weighted_graph(G, node_features=node_features_after_conv, fname=f'{DEFAULT_FIGURES_LOCATION}/toy_graph_conv_K{K}.png')
+
     
 
