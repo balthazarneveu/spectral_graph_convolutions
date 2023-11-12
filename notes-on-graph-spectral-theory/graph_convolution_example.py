@@ -65,9 +65,8 @@ def draw_weighted_graph(G: nx.Graph, node_features: dict = None, fname: str = No
     # node feature
     if node_features is None:
         node_features = nx.get_node_attributes(G, "feat")
-        # node_features = {idx: f"({idx:d}):{val[0]:.1f}" for idx, val in node_features.items()}
         node_features = {idx: f"{idx:d}" for idx, val in node_features.items()}
-    print('node_features', node_features)
+    # print('node_features', node_features)
     nx.draw_networkx_labels(G, pos, labels=node_features) #font_size=20, font_family="sans-serif") # node labels
     
     # edge weight labels
@@ -107,8 +106,9 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
         init = eval(f"torch.nn.init.{initialization}_")
         for lins in conv.lins:
             init(lins.weight)
-    for idx in range(len(conv.lins)):
-        print(f"{idx} ->{conv.lins[idx].weight}")
+    # Checking every weights is 1
+    # for idx in range(len(conv.lins)):
+    #     print(f"{idx} ->{conv.lins[idx].weight}")
     out = conv(node_features, edge_indices, edge_weights) # (|V|, out_channels)
     return out
 
@@ -160,13 +160,16 @@ def main():
     
 
     for k in range(1, K+1):
+        print(20*"-" + f" {k=} " + 20*"-")
         out_conv = compute_graph_convolution(G, K=k, out_channels=1, normalization='sym', initialization="ones")
         node_features_after_conv = {i: f"{out_conv[i][0]:.2f}" for i in range(len(out_conv))}
         print('node_features_after_conv', node_features_after_conv)
-        print(f"{k=}")
+        
         id = np.eye(norm_lap.shape[0])
         t0 = node_features
         t1 = np.dot(norm_lap-id, node_features)
+        if k>1:
+            print("Manual ChebConv - (weights=1)")
         if k==2:
             matprint(t0+t1)
         if k==3:
