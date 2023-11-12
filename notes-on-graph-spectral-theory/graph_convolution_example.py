@@ -102,15 +102,35 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
     return out
 
 
+def matprint(mat, fmt=".03f"):
+    # Inspired from https://gist.github.com/braingineer/d801735dac07ff3ac4d746e1f218ab75
+    col_maxes = [max([len(("{:"+fmt+"}").format(x)) for x in col]) for col in mat.T]
+    mat_str = ""
+    for x in mat:
+        mat_row = "[ "
+        for i, y in enumerate(x):
+            digit = ("{:"+str(col_maxes[i])+fmt+"}").format(y)
+            if y == 0:
+                digit = " "*((len(digit)-1 )//2 )+  "0" + " "*((len(digit)-1)//2)
+            mat_row+= digit + " "
+        mat_row+= "  ]"
+        mat_str+= mat_row + "\n"
+    mat_str = mat_str[:-1]
+    print(mat_str)
+    return mat_str
+
 if __name__ == '__main__':
     K=3
     G = create_simple_graph()
     draw_weighted_graph(G, fname=f"{DEFAULT_FIGURES_LOCATION}/toy_graph_init.png")
     # print graph
     norm_lap = compute_graph_laplacian(G)
-    print('lap', norm_lap)
-    print(norm_lap@norm_lap)
-    print(norm_lap@norm_lap@norm_lap)
+    print('normalized laplacian matrix')
+    matprint(norm_lap)
+    print('normalized laplacian matrix²')
+    matprint(norm_lap@norm_lap)
+    print('normalized laplacian matrix³')
+    matprint(norm_lap@norm_lap@norm_lap)
 
     out_conv = compute_graph_convolution(G, K=K, out_channels=1, normalization='sym', initialization="ones")
     node_features_after_conv = {i: torch.round(out_conv[i]).tolist() for i in range(len(out_conv))}
