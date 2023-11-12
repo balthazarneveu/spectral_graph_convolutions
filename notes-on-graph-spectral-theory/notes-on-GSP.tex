@@ -104,30 +104,27 @@ On the illustration \ref{fig:toyGraph}, we notice that the greater the order of 
 
  \begin{figure}
     \centering
-    \begin{subfigure}{0.2\textwidth}
-        \includegraphics[width=\textwidth]{figures/toy_graph_init.png}
-        \caption{Toy graph}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.45\textwidth]{figures/toy_graph_init.png}
+        \includegraphics[width=0.45\textwidth]{figures/toy_graph_conv_K1.png}
+        \caption{Toy graph\\ $\leftarrow$ indexes of the nodes | initial features values ($K=1$) $\rightarrow$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.3\textwidth}
+    \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/toy_graph_conv_K1.png}
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/lap1.png}
-        \caption{Convolution with $K=1$}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \centering
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/toy_graph_conv_K2.png}
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/lap2.png}
+        \includegraphics[width=0.45\textwidth]{figures/toy_graph_conv_K2.png}
+        \includegraphics[width=0.45\textwidth]{figures/lap1.png}
         \caption{Convolution with $K=2$}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.3\textwidth}
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/toy_graph_conv_K3.png}
-        \includegraphics[width=0.45\textwidth, height=1.5cm]{figures/lap3.png}
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.45\textwidth]{figures/toy_graph_conv_K2.png}
+        \includegraphics[width=0.45\textwidth]{figures/lap2.png}
         \caption{Convolution with $K=3$}
     \end{subfigure}
+    \hfill
     \caption{Convolution of a toy graph and the normalized laplacian matrix $\widetilde{\mathbf{L}}^K$ for $K=1, 2, 3$.}
     \label{fig:toyGraph}
     \Description[]{illustration of convolution on graph}

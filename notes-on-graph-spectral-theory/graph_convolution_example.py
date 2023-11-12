@@ -60,6 +60,8 @@ def draw_weighted_graph(G: nx.Graph, node_features: dict = None, fname: str = No
     # node feature
     if node_features is None:
         node_features = nx.get_node_attributes(G, "feat")
+        # node_features = {idx: f"({idx:d}):{val[0]:.1f}" for idx, val in node_features.items()}
+        node_features = {idx: f"{idx:d}" for idx, val in node_features.items()}
     print('node_features', node_features)
     nx.draw_networkx_labels(G, pos, labels=node_features) #font_size=20, font_family="sans-serif") # node labels
     
@@ -89,16 +91,17 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
     # compute graph convolution
     conv = ChebConv(
         in_channels=node_features.shape[1],
-        out_channels=out_channels, K=K,
+        out_channels=out_channels,
+        K=K,
         normalization=normalization
-        )
-    
+    )
+
     # initialize weights
     if initialization is not None:
         init = eval(f"torch.nn.init.{initialization}_")
         for lins in conv.lins:
             init(lins.weight)
-
+    
     out = conv(node_features, edge_indices, edge_weights) # (|V|, out_channels)
     return out
 
@@ -132,10 +135,11 @@ def save_string_to_image(text: str, fname: str, size=(400, 400)):
     img.save(fname)
 
 
-if __name__ == '__main__':
+def main():
     K=3
     G = create_simple_graph()
     draw_weighted_graph(G, fname=f"{DEFAULT_FIGURES_LOCATION}/toy_graph_init.png")
+
     # print graph
     norm_lap = compute_graph_laplacian(G)
     print('normalized laplacian matrix')
@@ -144,11 +148,16 @@ if __name__ == '__main__':
     save_string_to_image(matprint(norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap2.png")
     print('normalized laplacian matrix³')
     save_string_to_image(matprint(norm_lap@norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap3.png")
+    
+    for k in range(1, K+1):
+        out_conv = compute_graph_convolution(G, K=k, out_channels=1, normalization='sym', initialization="ones")
+        node_features_after_conv = {i: f"{out_conv[i][0]:.2f}" for i in range(len(out_conv))}
+        print('node_features_after_conv', node_features_after_conv)
+        draw_weighted_graph(G, node_features=node_features_after_conv, fname=f'{DEFAULT_FIGURES_LOCATION}/toy_graph_conv_K{k}.png')
 
-    out_conv = compute_graph_convolution(G, K=K, out_channels=1, normalization='sym', initialization="ones")
-    node_features_after_conv = {i: torch.round(out_conv[i]).tolist() for i in range(len(out_conv))}
-    print('node_features_after_conv', node_features_after_conv)
-    draw_weighted_graph(G, node_features=node_features_after_conv, fname=f'{DEFAULT_FIGURES_LOCATION}/toy_graph_conv_K{K}.png')
+if __name__ == '__main__':
+    main()
+    
 
     
 
