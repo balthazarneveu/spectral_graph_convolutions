@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from config import DEFAULT_FIGURES_LOCATION
 from PIL import Image, ImageDraw, ImageFont
+from torch_geometric.utils import from_networkx
 
 import torch
 from torch_geometric.nn import ChebConv
@@ -86,11 +87,12 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
     ----------
     G: networkx graph
     """
+    g = from_networkx(G)
 
     # get graph dim
-    edge_weights = torch.tensor([G[u][v]['weight'] for u, v in G.edges()], dtype=torch.float32) # (|E|, )
-    node_features = torch.tensor([G.nodes[i]['feat'] for i in G.nodes()], dtype=torch.float32) # (|V|, feat_dim)
-    edge_indices = torch.tensor([e for e in G.edges()], dtype=torch.int64).permute(1, 0) # (2, |E|) 
+    edge_weights = g.weight.type(torch.float32) # torch.float32 (|E|, ) 
+    node_features = g.feat.type(torch.float32) # torch.float32 (|V|, feat_dim)
+    edge_indices = g.edge_index.type(torch.long) # torch.int64 (2, |E|)
 
     # compute graph convolution
     conv = ChebConv(
