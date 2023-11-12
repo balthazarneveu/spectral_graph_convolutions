@@ -3,6 +3,7 @@ import numpy as np
 #from scipy.sparse import diags, eye
 import matplotlib.pyplot as plt
 from config import DEFAULT_FIGURES_LOCATION
+from PIL import Image, ImageDraw, ImageFont
 
 import torch
 from torch_geometric.nn import ChebConv
@@ -113,11 +114,23 @@ def matprint(mat, fmt=".03f"):
             if y == 0:
                 digit = " "*((len(digit)-1 )//2 )+  "0" + " "*((len(digit)-1)//2)
             mat_row+= digit + " "
-        mat_row+= "  ]"
+        mat_row+= " ]"
         mat_str+= mat_row + "\n"
     mat_str = mat_str[:-1]
     print(mat_str)
     return mat_str
+
+
+
+def save_string_to_image(text: str, fname: str, size=(400, 400)):
+    # Create an image with white background and add black text on it
+    img = Image.new('RGB', size, color = (255, 255, 255))
+    d = ImageDraw.Draw(img)
+    font = ImageFont.truetype("cour.ttf", 16)
+    text_position = (10, 50)
+    d.text(text_position, text, fill=(0, 0, 0), font=font)
+    img.save(fname)
+
 
 if __name__ == '__main__':
     K=3
@@ -126,11 +139,11 @@ if __name__ == '__main__':
     # print graph
     norm_lap = compute_graph_laplacian(G)
     print('normalized laplacian matrix')
-    matprint(norm_lap)
+    save_string_to_image(matprint(norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap1.png")
     print('normalized laplacian matrix²')
-    matprint(norm_lap@norm_lap)
+    save_string_to_image(matprint(norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap2.png")
     print('normalized laplacian matrix³')
-    matprint(norm_lap@norm_lap@norm_lap)
+    save_string_to_image(matprint(norm_lap@norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap3.png")
 
     out_conv = compute_graph_convolution(G, K=K, out_channels=1, normalization='sym', initialization="ones")
     node_features_after_conv = {i: torch.round(out_conv[i]).tolist() for i in range(len(out_conv))}
