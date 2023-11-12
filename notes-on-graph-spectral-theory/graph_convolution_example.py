@@ -107,7 +107,8 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
         init = eval(f"torch.nn.init.{initialization}_")
         for lins in conv.lins:
             init(lins.weight)
-    
+    for idx in range(len(conv.lins)):
+        print(f"{idx} ->{conv.lins[idx].weight}")
     out = conv(node_features, edge_indices, edge_weights) # (|V|, out_channels)
     return out
 
@@ -145,7 +146,7 @@ def main():
     K=3
     G = create_simple_graph()
     draw_weighted_graph(G, fname=f"{DEFAULT_FIGURES_LOCATION}/toy_graph_init.png")
-
+    
     # print graph
     norm_lap = compute_graph_laplacian(G)
     print('normalized laplacian matrix')
@@ -154,12 +155,49 @@ def main():
     save_string_to_image(matprint(norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap2.png")
     print('normalized laplacian matrix³')
     save_string_to_image(matprint(norm_lap@norm_lap@norm_lap), fname=f"{DEFAULT_FIGURES_LOCATION}/lap3.png")
+
+    node_features = np.array([G.nodes[i]['feat'] for i in G.nodes()], dtype=np.float32) # (|V|, feat_dim)
     
+
     for k in range(1, K+1):
         out_conv = compute_graph_convolution(G, K=k, out_channels=1, normalization='sym', initialization="ones")
         node_features_after_conv = {i: f"{out_conv[i][0]:.2f}" for i in range(len(out_conv))}
         print('node_features_after_conv', node_features_after_conv)
+        print(f"{k=}")
+        id = np.eye(norm_lap.shape[0])
+        t0 = node_features
+        t1 = np.dot(norm_lap-id, node_features)
+        if k==2:
+            matprint(t0+t1)
+        if k==3:
+            t2 = 2* np.dot(norm_lap-id, t1) - t0
+            matprint(t2+t1+t0)
+        print("ChebConv - (weights=1) results")
+        matprint(out_conv.detach().numpy())
+        
         draw_weighted_graph(G, node_features=node_features_after_conv, fname=f'{DEFAULT_FIGURES_LOCATION}/toy_graph_conv_K{k}.png')
+
+
+        # NOTE!
+        # Doc is deceptive: https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.ChebConv
+        # "Message passing" propagation seems to mean applying (L~  - Id)
+
+        # Forward in cheb_conv
+        # Tx_0 = x
+        # Tx_1 = x  # Dummy.
+        # out = self.lins[0](Tx_0)
+
+        # # propagate_type: (x: Tensor, norm: Tensor)
+        # if len(self.lins) > 1:
+        #     Tx_1 = self.propagate(edge_index, x=x, norm=norm, size=None)
+        #     out = out + self.lins[1](Tx_1)
+
+        # for lin in self.lins[2:]:
+        #     Tx_2 = self.propagate(edge_index, x=Tx_1, norm=norm, size=None)
+        #     Tx_2 = 2. * Tx_2 - Tx_0
+        #     out = out + lin.forward(Tx_2)
+        #     Tx_0, Tx_1 = Tx_1, Tx_2
+
 
 if __name__ == '__main__':
     main()
