@@ -8,13 +8,17 @@ from PIL import Image, ImageDraw, ImageFont
 import torch
 from torch_geometric.nn import ChebConv
 
-def compute_graph_laplacian(graph: nx.Graph) -> np.ndarray:
+def compute_graph_laplacian(graph: nx.Graph, normalization="sym") -> np.ndarray:
+    """Networkx graph to Laplacian matrix.
+    Assumes undirected graphs!
+    
+    - normalization = None -> D -W
+    - normalization = `sym` ->  Id - D^-1/2 W D^-1/2
     """
-    D^-1/2 W D^-1/2
-    """
-
     W = nx.adjacency_matrix(graph).toarray() # (|V|, |V|)
-    deg = np.sum(W, axis=1) 
+    deg = np.sum(W, axis=1)
+    if normalization is None:
+        return np.diag(deg)-W
     D = np.diag(np.sqrt(1./deg))
 
     return np.eye(W.shape[0])-D@W@D
