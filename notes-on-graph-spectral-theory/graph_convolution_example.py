@@ -17,7 +17,7 @@ def compute_graph_laplacian(graph: nx.Graph) -> np.ndarray:
     deg = np.sum(W, axis=1) 
     D = np.diag(np.sqrt(1./deg))
 
-    return D@W@D
+    return np.eye(W.shape[0])-D@W@D
 
 def create_simple_graph() -> nx.Graph:
     G = nx.Graph()
@@ -106,7 +106,7 @@ def compute_graph_convolution(G: nx.Graph, K: int =1, out_channels: int =2, norm
     return out
 
 
-def matprint(mat, fmt=".03f"):
+def matprint(mat, fmt=".02f"):
     # Inspired from https://gist.github.com/braingineer/d801735dac07ff3ac4d746e1f218ab75
     col_maxes = [max([len(("{:"+fmt+"}").format(x)) for x in col]) for col in mat.T]
     mat_str = ""
@@ -114,8 +114,8 @@ def matprint(mat, fmt=".03f"):
         mat_row = "[ "
         for i, y in enumerate(x):
             digit = ("{:"+str(col_maxes[i])+fmt+"}").format(y)
-            if y == 0:
-                digit = " "*((len(digit)-1 )//2 )+  "0" + " "*((len(digit)-1)//2)
+            if y == 0 or y==1 or y==-1:
+                digit = " "*((len(digit)-1 )//2 )+  f"{int(y):d}" + " "*((len(digit)-1)//2)
             mat_row+= digit + " "
         mat_row+= " ]"
         mat_str+= mat_row + "\n"
