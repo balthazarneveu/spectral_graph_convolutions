@@ -22,9 +22,34 @@ class AbideData():
         assert folder_root.exists()
         self.folder_root = folder_root
         self.indexes_path = sorted(list(self.folder_root.glob("5*")))
+        self.n_patients = len(self.indexes_path)
 
     def get_connectivity_matrix(self, index: int) -> np.ndarray:
         subject_path = self.indexes_path[index]
         subject_index = subject_path.name[:5]
         con = loadmat(str(subject_path/f"{subject_index}_ho_correlation.mat"))["connectivity"]
         return con
+
+    def get_connectivity_features(self, index: int) -> np.ndarray:
+        """Retrieve upper triangular coefficients (~ 6000 components)
+        without any fancy pre-processing
+
+        Args:
+            index (int): patient index
+
+        Returns:
+            np.ndarray: connectivity vector
+        """
+        mat = self.get_connectivity_matrix(index)
+        return mat[np.triu_indices_from(mat)]
+    
+    def get_input_feature_map(self) -> np.ndarray:
+        """Retrieve feature maps
+
+        Returns:
+            np.ndarray: N inviduals x C features
+        """
+        mat_feat = []
+        for patient_index in range(self.n_patients):
+            mat_feat.append(self.get_connectivity_features(patient_index))
+        return np.array(mat_feat)
