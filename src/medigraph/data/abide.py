@@ -67,6 +67,7 @@ class AbideData():
         for k, subject_id in enumerate(self.subject_indices):
             ref = df.loc[df.SUB_ID == subject_id].iloc[0]
             for j in range(k+1, self.n_patients):
+                # No self loop included (k+1)
                 cand = df.loc[df.SUB_ID == self.subject_indices[j]].iloc[0]
                 score = 0.
                 # Link if patients have same sex
