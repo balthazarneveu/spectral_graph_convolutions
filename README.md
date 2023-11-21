@@ -39,6 +39,8 @@ Student project on [Spectral Graph Convolutions for Population-based Disease Pre
 
 ```bash
 git clone git@github.com:balthazarneveu/sprectral_graph_convolutions.git
+cd sprectral_graph_convolutions
+pip install -e .
 python3 ABIDE_dataset/download_preprocess.py
 ```
 - Clone repository

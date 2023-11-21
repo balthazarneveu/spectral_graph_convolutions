@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "medigraph"
+version = "0.0.0"
+authors = [
+  { name="Balthazar Neveu", email="balthazarneveu@gmail.com" },
+]
+description = "Spectral graph convolutions for medical classification"
+readme = "readme.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/balthazarneveu/sprectral_graph_convolutions"
+"Bug Tracker" = "https://github.com/balthazarneveu/sprectral_graph_convolutions/issues"
