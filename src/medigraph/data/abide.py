@@ -1,7 +1,8 @@
 import logging
 from pathlib import Path
 from scipy.io import loadmat
-from typing import List
+from typing import List, Tuple
+from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
@@ -70,7 +71,7 @@ class AbideData():
         metadata_mask = np.zeros((self.n_patients, self.n_patients))
         df = pd.read_csv(self.metadata_path)
 
-        for k, subject_id in enumerate(self.subject_indices):
+        for k, subject_id in tqdm(enumerate(self.subject_indices), total=self.n_patients, desc="Metadata mask"):
             ref = df.loc[df.SUB_ID == subject_id].iloc[0]
             for j in range(k+1, self.n_patients):
                 # No self loop included (k+1)
@@ -87,7 +88,7 @@ class AbideData():
 
         return metadata_mask
 
-    def get_graph(self) -> np.ndarray:
+    def get_graph_adjacency(self) -> np.ndarray:
         """Construct graph from
         - features similarity
         - metadata
