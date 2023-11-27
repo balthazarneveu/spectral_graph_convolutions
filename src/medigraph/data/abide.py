@@ -14,14 +14,20 @@ PIPELINE = 'cpac'
 STRATEGY = 'filt_noglobal'
 ATLAS_NAME = 'ho'
 
-DEFAULT_ABIDE_LOCATION = DEFAULT_ABIDE_ROOT_LOCATION / ABIDE_PCP / PIPELINE/ STRATEGY
+DEFAULT_ABIDE_LOCATION = DEFAULT_ABIDE_ROOT_LOCATION / ABIDE_PCP / PIPELINE / STRATEGY
 
 if not DEFAULT_ABIDE_LOCATION.exists():
     logging.warning(f"No ABIDE DATA found at {DEFAULT_ABIDE_LOCATION}")
 
 
 class AbideData():
+    """ABIDE dataset wrapper (load data from disk, preprocess and provide a graph representation)
+    """
+
     def __init__(self, folder_root: Path = DEFAULT_ABIDE_ROOT_LOCATION) -> None:
+        """Assumes that data is stored in the folder_root
+        Use ABIDE_dataset/download_preprocess.py to download the data
+        """
         assert folder_root.exists()
         self.folder_root = folder_root / ABIDE_PCP / PIPELINE / STRATEGY
         self.indexes_path = sorted(list(self.folder_root.glob("5*")))
@@ -82,7 +88,13 @@ class AbideData():
         return metadata_mask
 
     def get_graph(self) -> np.ndarray:
+        """Construct graph from
+        - features similarity
+        - metadata
 
+        Returns:
+            np.ndarray: Dense adajcency matrix
+        """
         inp_feat = self.get_input_feature_map()
 
         distv = distance.pdist(inp_feat, metric='correlation')
