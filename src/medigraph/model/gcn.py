@@ -44,4 +44,3 @@ class GCN(torch.nn.Module):
         x = self.gcn2(x)
         logit = self.classifier(x)
         return logit.squeeze()
-
