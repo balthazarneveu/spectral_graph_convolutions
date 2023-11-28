@@ -6,6 +6,8 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
+from medigraph.data.properties import ADJ, RAW_INP, LABELS
+from medigraph.data.io import Dump
 
 DEFAULT_ABIDE_NAME = "__ABIDE_dataset"
 root_folder = Path(__file__).parent.parent.parent.parent.absolute()
@@ -35,6 +37,7 @@ class AbideData():
         self.n_patients = len(self.indexes_path)
         self.metadata_path = folder_root / ABIDE_PCP / 'Phenotypic_V1_0b_preprocessed1.csv'
         self.subject_indices = [int(subject_path.name[:5]) for subject_path in self.indexes_path]
+        self.training_data_path = folder_root / "data_dict.pkl"
         assert self.metadata_path.exists()
 
     def get_connectivity_matrix(self, index: int) -> np.ndarray:
@@ -130,3 +133,28 @@ class AbideData():
         mask = self.get_metadata_mask()
 
         return mask * sim_graph
+
+    def get_training_data(self, override=False) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Retrieve training data
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: (features, labels, adjacency matrix)
+            - features: V x F
+                - V: number of vertices 871 patients
+                - F: number of features 6216 for raw inputs (connectivity matrix)
+            - labels: V
+            - adjacency matrix: V x V
+        """
+        if self.training_data_path.exists() and not override:
+            data_dict = Dump.load_pickle(self.training_data_path)
+        else:
+            adj_np = self.get_graph_adjacency()  # [V, V]
+            inp_np = self.get_input_feature_map()  # [V, F]
+            labels_np = self.get_labels()
+            data_dict = {
+                ADJ: adj_np,
+                RAW_INP: inp_np,
+                LABELS: labels_np
+            }
+            Dump.save_pickle(data_dict, self.training_data_path)
+        return data_dict[RAW_INP], data_dict[LABELS], data_dict[ADJ]
