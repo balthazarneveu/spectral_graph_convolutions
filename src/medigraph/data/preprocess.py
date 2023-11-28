@@ -4,7 +4,7 @@ import torch
 
 def whiten(inp: torch.Tensor) -> torch.Tensor:
     """Make data white over the dataset
-    µ=0 and sigma=1 for each of the F components of the input 
+    µ=0 and sigma=1 for each of the F components of the input
     Args:
         inp (torch.Tensor): [V, F] non normalized input
 
@@ -40,4 +40,3 @@ def sanitize_data(input: torch.Tensor) -> torch.Tensor:
     non_zero_std_indices = torch.nonzero(std, as_tuple=True)[0]
     clean_inp = input[:, non_zero_std_indices]
     return clean_inp
-
