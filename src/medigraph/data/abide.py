@@ -38,6 +38,14 @@ class AbideData():
         assert self.metadata_path.exists()
 
     def get_connectivity_matrix(self, index: int) -> np.ndarray:
+        """Retrieve connectivity matrix for a given patient from disk
+
+        Args:
+            index (int): Patient index
+
+        Returns:
+            np.ndarray: Connectivity matrix [111 x 111]
+        """
         subject_path = self.indexes_path[index]
         subject_index = subject_path.name[:5]
         con = loadmat(str(subject_path/f"{subject_index}_ho_correlation.mat"))["connectivity"]
@@ -56,6 +64,18 @@ class AbideData():
         mat = self.get_connectivity_matrix(index)
         return mat[np.triu_indices_from(mat)]
 
+    def get_labels(self) -> np.ndarray:
+        """Retrieve labels for each patient (DX_GROUP)
+
+        Returns:
+            np.ndarray: 1D array of labels
+        """
+        self.get_metadata()
+        labels = []
+        for subject_id in self.subject_indices:
+            labels.append(self.df.loc[self.df.SUB_ID == subject_id].iloc[0].DX_GROUP)
+        return np.array(labels)-1
+
     def get_input_feature_map(self) -> np.ndarray:
         """Retrieve feature maps
 
@@ -67,15 +87,19 @@ class AbideData():
             mat_feat.append(self.get_connectivity_features(patient_index))
         return np.array(mat_feat)
 
+    def get_metadata(self) -> pd.DataFrame:
+        if not hasattr(self, "df"):
+            self.df = pd.read_csv(self.metadata_path)
+
     def get_metadata_mask(self) -> np.ndarray:
+        self.get_metadata()
         metadata_mask = np.zeros((self.n_patients, self.n_patients))
-        df = pd.read_csv(self.metadata_path)
 
         for k, subject_id in tqdm(enumerate(self.subject_indices), total=self.n_patients, desc="Metadata mask"):
-            ref = df.loc[df.SUB_ID == subject_id].iloc[0]
+            ref = self.df.loc[self.df.SUB_ID == subject_id].iloc[0]
             for j in range(k+1, self.n_patients):
                 # No self loop included (k+1)
-                cand = df.loc[df.SUB_ID == self.subject_indices[j]].iloc[0]
+                cand = self.df.loc[self.df.SUB_ID == self.subject_indices[j]].iloc[0]
                 score = 0.
                 # Link if patients have same sex
                 if ref.SEX == cand.SEX:

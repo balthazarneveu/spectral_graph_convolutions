@@ -8,7 +8,7 @@ class BasicGCNDenseLayer(torch.nn.Module):
 
     def __init__(self, input_dim, output_dim, normalized_adjacency_matrix: torch.Tensor):
         super().__init__()
-        self.fc1 = torch.nn.Linear(input_dim, output_dim, dtype=torch.float64)
+        self.fc1 = torch.nn.Linear(input_dim, output_dim)
         self.adj = normalized_adjacency_matrix
 
     def forward(self, inp: torch.Tensor):
@@ -28,18 +28,19 @@ class GCN(torch.nn.Module):
         adj = d_inv_sqrt @ adj @ d_inv_sqrt  # D^-1/2 A D^-1/2
         return adj
 
-    def __init__(self, input_dim, adjacency: torch.Tensor):
+    def __init__(self, input_dim, adjacency: torch.Tensor, hdim):
         super().__init__()
-        hdim1 = 512
-        hdim2 = hdim1//2
+        hdim1 = hdim
+        hdim2 = hdim1
         output_dim = 1  # Binary classification here
         self.adj = GCN.get_normalized_adjacency_matrix(adjacency)
         self.gcn1 = BasicGCNDenseLayer(input_dim, hdim1, self.adj)
         self.gcn2 = BasicGCNDenseLayer(hdim1, hdim2, self.adj)
-        self.classifier = torch.nn.Linear(hdim2, output_dim, dtype=torch.float64)
+        self.classifier = torch.nn.Linear(hdim2, output_dim)
 
     def forward(self, inp: torch.Tensor):
         x = self.gcn1(inp)
         x = self.gcn2(x)
         logit = self.classifier(x)
-        return logit
+        return logit.squeeze()
+
