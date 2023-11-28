@@ -14,7 +14,7 @@ class BasicGCNDenseLayer(torch.nn.Module):
     def forward(self, inp: torch.Tensor):
         x = self.fc1(inp)
         x = self.adj @ x
-        x = torch.nn.functional.relu(x, inplace=True)
+        x = torch.nn.functional.relu(x)
         return x
 
 
@@ -37,9 +37,10 @@ class GCN(torch.nn.Module):
         self.gcn1 = BasicGCNDenseLayer(input_dim, hdim1, self.adj)
         self.gcn2 = BasicGCNDenseLayer(hdim1, hdim2, self.adj)
         self.classifier = torch.nn.Linear(hdim2, output_dim)
+        self.classifier2 = torch.nn.Linear(input_dim, output_dim)
 
-    def forward(self, inp: torch.Tensor):
-        x = self.gcn1(inp)
+    def forward(self, x: torch.Tensor):
+        x = self.gcn1(x)
         x = self.gcn2(x)
         logit = self.classifier(x)
         return logit.squeeze()
