@@ -5,7 +5,7 @@ from medigraph.model.gcn import GCN
 from medigraph.model.baseline import DenseNN
 import torch
 from medigraph.data.preprocess import sanitize_data, whiten
-from medigraph.data.properties import INPUTS, LABELS
+from medigraph.data.properties import INPUTS, LABELS, ADJ
 from medigraph.model.metrics import plot_metrics
 import logging
 
@@ -14,16 +14,17 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def prepare_training_data(device=DEVICE):
     dat = AbideData()
-    inp_np, lab_np, adj_np = dat.get_training_data()
+    data_dict = dat.get_training_data(dimension_reduction="rfe")
+    adj_np = data_dict[ADJ]
+    lab_np = data_dict[LABELS]
+    inp_np = data_dict[INPUTS]
     logging.info(f"Adjacency matrix : {adj_np.shape} [VxV]")
     logging.info(f"Labels {lab_np.shape} : [V]")
     logging.info(f"Input feature vector {inp_np.shape} : [VxF]")
 
     adj = torch.tensor(adj_np, dtype=torch.float32).to(device)
-    inp_raw = torch.tensor(inp_np, dtype=torch.float32).to(device)  # [V=871,  F6216]
+    inp = torch.tensor(inp_np, dtype=torch.float32).to(device)  # [V=871,  F6216]
     lab = torch.tensor(lab_np, dtype=torch.float32).to(device)  # for binary classification
-    clean_inp = sanitize_data(inp_raw)
-    inp = whiten(clean_inp)
     training_data = {
         INPUTS: inp,
         LABELS: lab
