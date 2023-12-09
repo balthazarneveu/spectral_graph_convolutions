@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
 
+TRAIN = "train"
+VALIDATION = "validation"
+TEST = "test"
+LOSS = "loss"
+ACCURACY = "accuracy"
+
 
 def plot_metrics(metric_dict: dict) -> None:
     """Compare training metrics of different models
@@ -9,20 +15,36 @@ def plot_metrics(metric_dict: dict) -> None:
         ```
         {
             "model1": {
-                "training_losses": [float],
-                "training_accuracies": [float]
+                "loss": {
+                    "train": [float],
+                    "validation: [float]
                 },
+                "accuracy": {
+                    "train": [float],
+                    "validation: [float]
+                }
             "model2": {
-                "training_losses": [float],
-                "training_accuracies": [float]
+                "loss": {
+                    "train": [float],
+                    "validation: [float]
+                },
+                "accuracy": {
+                    "train": [float],
+                    "validation: [float]
+                }
             }
         }
         ```
     """
     fig, axs = plt.subplots(1, 2, figsize=(10, 6))
-    for model_name, metric in metric_dict.items():
-        axs[0].plot(metric["training_losses"], label=model_name)
-        axs[1].plot(metric["training_accuracies"], label=f"{model_name} accuracy")
+    colors = ["b", "g", "r", "y", "k"]
+    # colors  = [""]
+    for idx, (model_name, metric) in enumerate(metric_dict.items()):
+        color = colors[idx % len(colors)]
+        axs[0].plot(metric[LOSS][TRAIN], color+"--", label=model_name)
+        axs[0].plot(metric[LOSS][VALIDATION], color+"-", label=model_name)
+        axs[1].plot(metric[ACCURACY][TRAIN], color+"--", label=f"{model_name} TRAIN accuracy")
+        axs[1].plot(metric[ACCURACY][VALIDATION], color+"-", label=f"{model_name} VALIDATION accuracy")
     for ax in axs:
         ax.legend()
         ax.grid()
