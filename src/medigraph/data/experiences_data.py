@@ -70,7 +70,7 @@ def get_training_dict_exp2(data : AbideData,
         labels = data.get_labels()
 
         mask_classifier = np.random.choice(train_mask, 300, replace=False)
-        selected_feat = data.get_selectedRidge_features(mask_classifier, n_features_to_select=nbFeatures)
+        selected_feat = data.get_selected_ridge_features(mask_classifier, n_features_to_select=nbFeatures)
 
         data_dict = {
             ADJ : adj,

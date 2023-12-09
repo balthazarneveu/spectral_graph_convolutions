@@ -2,7 +2,7 @@
 """
 import torch
 import matplotlib.pyplot as plt
-from tqdm import tqdm 
+from tqdm import tqdm
 
 # try:
 #     __IPYTHON__  # noqa: F821
@@ -56,15 +56,17 @@ def training_loop(
 
 # ---- METRICS AND TEST ----
 
+
 def compute_accuracy(output, labels):
 
     pred_label = (output >= 0.5).long()
-    correct = pred_label.eq(labels).double() 
+    correct = pred_label.eq(labels).double()
     correct = correct.sum()
     return correct / len(labels)
 
-def test(model, data, criterion = torch.nn.BCEWithLogitsLoss(), mask : str = TEST_MASK):
-    
+
+def compute_metrics(model, data, criterion=torch.nn.BCEWithLogitsLoss(), mask: str = TEST_MASK):
+
     model.eval()
     input_feat = data[INPUTS]
     labels = data[LABELS]
@@ -76,6 +78,7 @@ def test(model, data, criterion = torch.nn.BCEWithLogitsLoss(), mask : str = TES
     return loss_test, acc_test
 
 # ---- PLOTTING ----
+
 
 def plot_learning_curves(train_log, val_log, title="Training"):
     fig, ax = plt.subplots(1, 2, figsize=(10, 5))
@@ -93,14 +96,14 @@ def plot_learning_curves(train_log, val_log, title="Training"):
 # --- TRAIN LOOP FOR BINARY CLASSIFIER ---
 
 
-def train(model : torch.nn.Module, 
+def train(model: torch.nn.Module,
           data: dict,
           nEpochs: Optional[int] = 150,
           criterion: torch.nn.Module = torch.nn.BCEWithLogitsLoss(),
-          optimizer_params: Optional[dict ]={"lr": 5.E-3,
-                                            "weight_decay": 5.E-4}
-    )-> Tuple[torch.nn.Module, dict, dict]:
-    
+          optimizer_params: Optional[dict] = {"lr": 5.E-3,
+                                              "weight_decay": 5.E-4}
+          ) -> Tuple[torch.nn.Module, dict, dict]:
+
     optim = torch.optim.Adam(model.parameters(), **optimizer_params)
     train_log = {
         "losses": [],
