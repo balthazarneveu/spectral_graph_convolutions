@@ -63,12 +63,12 @@ def compute_accuracy(output, labels):
     correct = correct.sum()
     return correct / len(labels)
 
-def test(model, data, criterion = torch.nn.BCEWithLogitsLoss()):
+def test(model, data, criterion = torch.nn.BCEWithLogitsLoss(), mask : str = TEST_MASK):
     
     model.eval()
     input_feat = data[INPUTS]
     labels = data[LABELS]
-    test_mask = data[TEST_MASK]
+    test_mask = data[mask]
     print(f'=== Computing metrics on {len(test_mask)} test nodes ===')
     output_feat = model(input_feat)
     loss_test = criterion(output_feat[test_mask], labels[test_mask])
@@ -91,36 +91,6 @@ def plot_learning_curves(train_log, val_log, title="Training"):
     fig.suptitle(title)
 
 # --- TRAIN LOOP FOR BINARY CLASSIFIER ---
-
-
-# def get_training_dict(data, device: torch.device = device,
-#              nb_train: int = 600, 
-#              nb_val: int = 100):
-#     inp, labels, adj = data.get_training_data()
-
-#     inp = torch.tensor(inp, dtype=torch.float32).to(device)
-#     labels = torch.tensor(label, dtype=torch.float32).to(device)
-#     labels = torch.stack([1-labels, labels], dim=1)
-
-#     clean_inp = sanitize_data(inp)
-#     inp = whiten(clean_inp)
-
-#     # get random masks
-#     shuffle_nodes = np.random.permutation(range(inp.shape[0]))
-#     train_mask = shuffle_nodes[:nb_train]
-#     val_mask = shuffle_nodes[nb_train:nb_train+nb_val]
-#     test_mask = shuffle_nodes[nb_train+nb_val:]
-
-#     train_mask = torch.LongTensor(train_mask) #int64 tensor
-#     val_mask = torch.LongTensor(val_mask)
-#     test_mask = torch.LongTensor(test_mask)
-
-#     return { INPUTS : inp,
-#             LABELS : labels,
-#             TRAIN_MASK : train_mask,
-#             VAL_MASK : val_mask,
-#             TEST_MASK : test_mask
-#             }
 
 
 def train(model : torch.nn.Module, 
@@ -147,12 +117,20 @@ def train(model : torch.nn.Module,
     val_mask = data[VAL_MASK]
 
     model.train()
-    for _ in tqdm(range(nEpochs)):
+    for _ in tqdm(range(nEpochs), total=nEpochs, desc="Training"):
         optim.zero_grad()
 
         output_feat = model(input_feat)
+        assert output_feat[train_mask].requires_grad == True
+
         loss_train = criterion(output_feat[train_mask], labels[train_mask])
+
         loss_train.backward()
+
+        # debugging training
+        # for name, param in model.named_parameters():
+        #     print(f" Paremeter {name}, gradient norm : {param.grad.norm()}")
+
         optim.step()
 
         with torch.no_grad():

@@ -70,8 +70,9 @@ class AbideData():
         return mat[np.triu_indices_from(mat)]  # do arctanh like in the github ?? 
     
     def get_selectedRidge_features(self, mask_classifier: np.ndarray, n_features_to_select: int=200):
-        estimator = RidgeClassifier()
-        selector = RFE(estimator, n_features_to_select) # feature ranking recursive feature elimination
+        
+        estimator = RidgeClassifier() # classify according to the sign of a linear model
+        selector = RFE(estimator, n_features_to_select=n_features_to_select) # feature ranking recursive feature elimination
         
         full_features = self.get_input_feature_map()
         labels = self.get_labels()

@@ -3,7 +3,7 @@ import torch
 from scipy import sparse 
 import numpy as np
 import torch.nn.functional as F
-# from torch.nn.parameter import Parameter
+from torch_geometric.nn import ChebConv 
 
 
 class BasicGCNDenseLayer(torch.nn.Module):
@@ -68,11 +68,11 @@ class SimpleGraphConvolution(torch.nn.Module):
     def forward(self, x: torch.Tensor, adj: torch.Tensor):
         support = self.fc(x)
         output = torch.spmm(adj, support)
-
+        
         return output
 
 class SparseGCN(torch.nn.Module):
-    """Graph Convolutional Network based of http://arxiv.org/abs/1609.02907"""
+    """Graph Convolutional Network based on http://arxiv.org/abs/1609.02907"""
 
     def get_normalized_adjacency_matrix(adj: np.array, dtype : torch.dtype=torch.float32):
         """ Apply the renormalization trick 
@@ -115,3 +115,31 @@ class SparseGCN(torch.nn.Module):
         # x = F.softmax(x, dim=1) # warning : usually for multi-class or when the loss is nnllloss
         return x
     
+class ChebGCN(torch.nn.Module):
+    def __init__(self, in_features :int , out_features:int, 
+                 adjacency : np.ndarray,
+                 K:int =3,
+                 proba_dropout: float = 0.3):
+        super().__init__()
+        self.proba_dropout = proba_dropout
+        self.chebconv = ChebConv(in_features, out_features, K)
+        self.adj = adjacency
+
+        self.edge_index = self.compute_edge_index()
+        self.edge_weight = self.compute_edge_weight()
+
+
+    def compute_edge_index(self):
+        edge_index = np.array(self.adj.nonzero())
+        edge_index = torch.tensor(edge_index, dtype=torch.long)
+        return edge_index
+    
+    def compute_edge_weight(self):
+        edge_weight = self.adj[self.edge_index[0], self.edge_index[1]]
+        return torch.tensor(edge_weight, dtype=torch.float32)
+    
+    def forward(self, x: torch.tensor):
+        
+        x = self.chebconv(x, self.edge_index, self.edge_weight)
+        x = F.dropout(x, self.proba_dropout, training=self.training)
+        return x
