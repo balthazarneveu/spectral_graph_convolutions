@@ -54,6 +54,8 @@ class AbideData():
         subject_path = self.indexes_path[index]
         subject_index = subject_path.name[:5]
         con = loadmat(str(subject_path/f"{subject_index}_ho_correlation.mat"))["connectivity"]
+
+        # con = np.arctanh(con)
         return con
 
     def get_connectivity_features(self, index: int) -> np.ndarray:
@@ -67,6 +69,7 @@ class AbideData():
             np.ndarray: connectivity vector
         """
         mat = self.get_connectivity_matrix(index)
+
         return mat[np.triu_indices_from(mat)]  # do arctanh like in the github ?? 
     
     def get_selectedRidge_features(self, mask_classifier: np.ndarray, n_features_to_select: int=200):
@@ -105,6 +108,7 @@ class AbideData():
         mat_feat = []
         for patient_index in range(self.n_patients):
             mat_feat.append(self.get_connectivity_features(patient_index))
+
         return np.array(mat_feat)
 
     def get_metadata(self) -> pd.DataFrame:
