@@ -8,8 +8,8 @@
 %---------------------
 %	COLORS
 %---------------------
-%\definecolor{plt-blue}{HTML}{1f77b4}
-%\definecolor{plt-orange}{HTML}{ff7f0e}
+\usepackage{xcolor}
+\newcommand{\blue}[1]{\textcolor{blue}{ #1 }}
 
 %---------------------
 %	THEOREMS
@@ -67,10 +67,12 @@
 \newcommand{\CC}{\mathbb{C}} % espace complexe
 \newcommand{\PP}{\mathbb{P}} % mesure de probabilité P
 \newcommand{\QQ}{\mathbb{Q}} % mesure de probabilité Q
-\newcommand{\EE}{\mathbb{E}} % espérance E
 \newcommand{\ZZ}{\mathbb{Z}} % mesure de probabilité Z
 \newcommand{\NN}{\mathbb{N}} % entiers positifs
 \newcommand{\GG}{\mathcal{G}} % graph
+\newcommand{\WW}{\mathbf{W}} % adjacency matrix
+\newcommand{\EE}{\mathcal{E}} % edge set of a graph
+
 %\newcommand\intervalint[1]{\llbracket #1 \rrbracket} % produit scalaire
 \newcommand\red[1]{\textcolor{red}{#1}} % colorer en rouge
 \newcommand\gray[1]{\textcolor{gray}{#1}} % colorer en gris
@@ -85,7 +87,6 @@
 \DeclareMathOperator*{\argmin}{\mbox{arg min}} % arg max qui marche mieux
 %\newcommand\res[2]{#1\ (\pm #2)} % pour les resultats: m (+- std)
 %\newcommand\code[1]{\fcolorbox{white}{gray!15}{\color[rgb]{0,.3,.6}\textsf{#1}}}
-%\newcommand\ruptures{\code{ruptures}} % package ruptures
 %\newcommand{\pp}{\mathbf{p}} %partition
 % \newcommand{\ttt}{\mathbf{t}} %change points
 %\newcommand{\ttt}{\mathcal{T}} %change points
