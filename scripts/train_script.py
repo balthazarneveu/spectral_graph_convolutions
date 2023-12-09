@@ -12,7 +12,7 @@ from itertools import product
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def prepare_training_data(device=DEVICE, dimension_reduction=None):
+def prepare_training_data(device=DEVICE, dimension_reduction=None, keep_frozen_masks=True):
     dat = AbideData()
     data_dict = dat.get_training_data(dimension_reduction=dimension_reduction)
     adj_np = data_dict[ADJ]
@@ -25,6 +25,7 @@ def prepare_training_data(device=DEVICE, dimension_reduction=None):
     adj = torch.tensor(adj_np, dtype=torch.float32).to(device)
     inp = torch.tensor(inp_np, dtype=torch.float32).to(device)  # [V=871,  F6216]
     lab = torch.tensor(lab_np, dtype=torch.float32).to(device)  # for binary classification
+
     training_data = {
         INPUTS: inp,
         LABELS: lab,
@@ -32,6 +33,11 @@ def prepare_training_data(device=DEVICE, dimension_reduction=None):
         VAL_MASK: data_dict[VAL_MASK],
         TEST_MASK: data_dict[TEST_MASK]
     }
+    if not keep_frozen_masks:
+        train_mask, val_mask, test_mask = dat.get_mask(train_ratio=0.8, val_ratio=0.1)
+        training_data[TRAIN_MASK] = train_mask
+        training_data[VAL_MASK] = val_mask
+        training_data[TEST_MASK] = test_mask
     return training_data, adj
 
 
@@ -47,13 +53,13 @@ def train(device=DEVICE):
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
     models_list = ["Dense"]
-    models_list = ["GCN-dr=0.3"]
-
+    models_list = ["GCN", "GCN-dr=0.3"]
+    models_list = ["Cheb-dr=0.3"]
     optimizer_params = {
         "lr": 1.E-4,
         "weight_decay": 0.1
     }
-    for feat_kind, model_name, noise_level in product([NORMALIZED_INPUTS], models_list, [0.1, None]):
+    for feat_kind, model_name, noise_level in product([RFE_DIM_REDUCTION], models_list, [0.1, None]):
         exp_name = f"{model_name} {feat_kind}"
         if noise_level is not None:
             exp_name += f" noise={noise_level:.2f}"
@@ -75,7 +81,8 @@ def train(device=DEVICE):
         if "gcn" in model_name.lower():
             model = GCN(feat_dim, adj, hdim=hdim, p_dropout=dropout)
         elif "cheb" in model_name.lower():
-            model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device)
+            # model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout)
+            model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout)
         elif "dense" in model_name.lower():
             model = DenseNN(feat_dim, hdim=hdim, p_dropout=dropout)
         elif "single" in model_name.lower():
