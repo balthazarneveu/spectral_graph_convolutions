@@ -41,17 +41,16 @@ def training_loop(
         model.train()
         optim.zero_grad()
         logit = model(train_input)
-        # print(logit.shape)
-        # print(logit[val_mask])
         loss = criterion(logit[train_mask], train_label[train_mask])
         loss.backward()
         optim.step()
+        model.eval()
         with torch.no_grad():
             for mode, mask in zip([TRAIN, VALIDATION, TEST], [train_mask, val_mask, test_maks]):
                 if mask is None:
                     continue
                 loss = criterion(logit[mask], train_label[mask])
-                
+
                 predicted_prob = torch.sigmoid(logit[mask]).squeeze()  # Apply sigmoid and remove extra dimensions
                 predicted = (predicted_prob >= 0.5).long()  # Convert probabilities to 0 or 1
                 correct = (predicted == train_label[mask]).sum().item()

@@ -2,7 +2,7 @@ from medigraph.train import training_loop
 
 from medigraph.data.abide import AbideData
 from medigraph.model.gcn import GCN, ChebGCN
-from medigraph.model.baseline import DenseNN
+from medigraph.model.baseline import DenseNN, DenseNNSingle
 import torch
 from medigraph.data.properties import INPUTS, LABELS, ADJ, RFE_DIM_REDUCTION, TRAIN_MASK, VAL_MASK, TEST_MASK, NORMALIZED_INPUTS
 from medigraph.model.metrics import plot_metrics
@@ -38,7 +38,12 @@ def prepare_training_data(device=DEVICE, dimension_reduction=None):
 def train(device=DEVICE):
 
     metric_dict = {}
-    for feat_kind, model_name in product([RFE_DIM_REDUCTION, NORMALIZED_INPUTS], ["Dense", "GCN"]):
+    # for feat_kind, model_name in product([RFE_DIM_REDUCTION, NORMALIZED_INPUTS], ["Dense", "GCN"]):
+    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Dense", "Single"]):
+    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["GCN",]):
+    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-1", "Single-4", "Single-8", "Single-16"]):
+
+    for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single", "Dense"]):
         exp_name = f"{model_name} {feat_kind}"
         training_data, adj = prepare_training_data(
             device=device,
@@ -49,8 +54,16 @@ def train(device=DEVICE):
             model = GCN(feat_dim, adj, hdim=64)
         elif model_name == "ChebNet":
             model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device)
+        elif model_name == "Dense":
+            model = DenseNN(feat_dim, hdim=16)
+        elif "Single" in model_name:
+            if "-" in model_name:
+                hdim = int(model_name.split("-")[1])
+            else:
+                hdim = 64
+            model = DenseNNSingle(feat_dim, hdim=hdim)
         else:
-            model = DenseNN(feat_dim, hdim=64)
+            raise ValueError(f"Unknown model name {model_name}")
         model.to(device)
         model, metrics = training_loop(model, training_data, device=device, n_epochs=1000)
         metric_dict[exp_name] = metrics
