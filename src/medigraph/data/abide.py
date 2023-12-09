@@ -6,6 +6,8 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
+from sklearn.linear_model import RidgeClassifier
+from sklearn.feature_selection import RFE
 from medigraph.data.properties import ADJ, RAW_INP, LABELS
 from medigraph.data.io import Dump
 
@@ -65,7 +67,21 @@ class AbideData():
             np.ndarray: connectivity vector
         """
         mat = self.get_connectivity_matrix(index)
-        return mat[np.triu_indices_from(mat)]
+        return mat[np.triu_indices_from(mat)]  # do arctanh like in the github ?? 
+    
+    def get_selectedRidge_features(self, mask_classifier: np.ndarray, n_features_to_select: int=200):
+        estimator = RidgeClassifier()
+        selector = RFE(estimator, n_features_to_select) # feature ranking recursive feature elimination
+        
+        full_features = self.get_input_feature_map()
+        labels = self.get_labels()
+        X = full_features[mask_classifier]
+        Y = labels[mask_classifier]
+
+        selector = selector.fit(X, Y) # Y.ravel() for contiguous flatten array
+        selected_features = selector.transform(full_features)
+
+        return selected_features
 
     def get_labels(self) -> np.ndarray:
         """Retrieve labels for each patient (DX_GROUP)
