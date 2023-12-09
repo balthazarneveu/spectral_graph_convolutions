@@ -4,13 +4,12 @@
 
 \subsection{Graph construction} 
 
-\blue{expliquer le dataset }
 
-Autism spectrum disorder (ASD) is now recognized to occor in more than 1\% of children. Despite continuing research advances, their pace and clinical impact have not kept up with the urgency to identify ways of determining the diagnosis at earlier ages, selecting optimal treatments, and predicting outcomes. , which aggregates data from different acquisition sites. The researchers \cite{Parisot17} proposed to tackled those challenges and applied their method on the Autism Brain Imaging Data Exchange (ABIDE) dataset, which consists of highly heterogeneous functional MRI data acquired at multiple sites. Resting-state functional magnetic resonance imaging (rs-fMRI) is a neuroimaging technique that measures and analyzes brain activity in a resting state, i.e., when a person is not engaged in any specific task. 
+Autism spectrum disorder (ASD) is now recognized to occur in more than 1\% of children. Despite continuing research advances, their pace and clinical impact have not kept up with the urgency to identify ways of determining the diagnosis at earlier ages, selecting optimal treatments, and predicting outcomes. The researchers \cite{Parisot17} proposed to tackle those challenges and applied their method on the Autism Brain Imaging Data Exchange (ABIDE) dataset, which consists of highly heterogeneous functional MRI data acquired at multiple sites. Resting-state functional magnetic resonance imaging (rs-fMRI) is a neuroimaging technique that measures and analyzes brain activity in a resting state, i.e., when a person is not engaged in any specific task. 
 It is based on the principle that different regions of the brain exhibit correlated spontaneous fluctuations in blood oxygen level-dependent (BOLD) signals even in the absence of an explicit stimulus or task. These fluctuations are thought to reflect the intrinsic functional connectivity of the brain. 
 
 The authors \cite{Parisot17} proposed to construct a population graph integrating imaging and non-imaging data. 
-They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}. Given the matrix's high dimensionality (6700 \blue{review true number}), they employed a ridge classifier to pinpoint the most discriminative features within the training set. 
+They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}. Given the matrix's high dimensionality (6700 \blue{review true number}), they employed a ridge classifier to pinpoint the most discriminative features within the training set. 
 
 They modeled the interactions between individuals via the definition of the graph edges $\EE$ which writes as follows for two nodes $v$ and $v'$ :
 $$ 
@@ -23,7 +22,7 @@ Sim(X_v, X_{v'}) =  1 - \frac{(X_v - \bar{X}_v).(X_{v'} - \bar{X}_{v'})}{\norm{X
 $$
 where $\bar{X}_v$ is the mean of the elements of the vectorized connectivity matrix of patient $v$. 
 
-On the figure \ref{fig:sorted_adjacency}, certain sets or squares stand out with significantly higher correlation along the diagonal exhibiting the proximiting between those metadata information. 
+On the figure \ref{fig:sorted_adjacency}, certain sets or squares stand out with significantly higher correlation along the diagonal exhibiting the proximity between those metadata information. 
 
 \begin{figure}[h!]
     \centering
@@ -39,15 +38,10 @@ To classify from this brain population graph, the authors \cite{Parisot17} propo
 \subsubsection{The main challenges of signal processing on graphs} 
 
 Graphs are widely used thanks to their generic data representation forms which are useful for describing the geometric structures of data domains in very different application fields, including social, energy, transportation, and brain modelisation.
-However, classical tools and techniques from signal processing can not be used seamlessly/candidly on graphs unlike audio signal and images \cite{shuman_emerging_2013}.
+However, classical tools and techniques from signal processing can not be used seamlessly on graphs unlike audio signal and images \cite{shuman_emerging_2013}.
 
-\begin{itemize}
-    \item Graphs have no inherent ordering of the vertices, unlike images where pixel is uniquely identified by its position within the image. We therefore need algorithms that are node-order equivariant: they should not depend on the ordering of the nodes \cite{daigavane_understanding_2021}.
-    \item Many graphs are irregular structures that lack a shift-invariant notion of translation, which is a key property of the Fourier transform.
-    \item The analogous spectrum in the graph setting is discrete and irregularly spaced, and it is therefore non-trivial to define an operator that correspond to translation in the graph spectral domain.
-    \item We may need to downsample a graph, and therefore we need a method to generate a coarser version of the graph that somehow captures the structural properties embedded in the original graph.
-    \item We need localized transforms that compute information about the data at each vertex by using data from a small neighbourhood of vertices close to it in the graph
-\end{itemize}
+In particular, graphs have no inherent ordering of the vertices, unlike images where pixel is uniquely identified by its position within the image. We therefore need algorithms that are node-order equivariant: they should not depend on the ordering of the nodes \cite{daigavane_understanding_2021}. We may also need localized transforms that compute information about the data at each vertex by using data from a small neighbourhood of vertices close to it in the graph.
+
 Graphs can also be very large but, in our study, we consider sparse population graphs, \ie individuals or nodes are connected to a limited number of nodes \footnote{We also say that the number of edges is linear in the number of nodes.}.
 Spectral graph theory has enabled constructing, analyzing, and manipulating graphs.
 
@@ -57,7 +51,7 @@ In this section, we present some basic definitions from spectral graph theory th
 
 \subsubsection{The non-normalized and normalized Graph Laplacian}
 
-The \textbf{non-normalized graph Laplacian}, also called the combinatorial graph Laplacian, is defined 
+The non-normalized graph Laplacian, also called the combinatorial graph Laplacian, is defined 
 as $\mathbf{L} = \mathbf{D}-\mathbf{W}$, where the degree matrix $\mathbf{D}$ 
 is a diagonal matrix 
 whose $i$th diagonal element, $d_i$, is equal to the sum of the weights of all edges incident to vertex $i$
@@ -75,7 +69,7 @@ Since we consider connected graphs, the eigenvalue $\lambda_0=0$ has multiplicit
 \textit{(There are as many null eigen values as there are connected components in the graph.)}
 
 A popular practice is to normalize each weight $W_{i, j}$ by a factor of $\frac{1}{\sqrt{d_id_j}}$.
-Doing so leads to the \textbf{normalized graph Laplacian}, which is defined as $\widetilde{\mathbf{L}} = D^{-1/2}\mathbf{L}D^{-1/2} = I_N - D^{-1/2}\mathbf{W}D^{-1/2}$
+Doing so leads to the normalized graph Laplacian, which is defined as $\widetilde{\mathbf{L}} = D^{-1/2}\mathbf{L}D^{-1/2} = I_N - D^{-1/2}\mathbf{W}D^{-1/2}$
 
 \textit{Note that the rows of  $\widetilde{\mathbf{L}}$ do not sum to zero, unlike the rows of $\mathbf{L}$}.
 
