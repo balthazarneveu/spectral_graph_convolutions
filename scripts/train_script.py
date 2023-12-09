@@ -41,31 +41,40 @@ def train(device=DEVICE):
     # for feat_kind, model_name in product([RFE_DIM_REDUCTION, NORMALIZED_INPUTS], ["Dense", "GCN"]):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Dense", "Single"]):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["GCN",]):
-    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-1", "Single-4", "Single-8", "Single-16"]):
-
-    for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single", "Dense"]):
+    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]):
+    n_epochs = 1000
+    models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
+    models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
+    models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
+    for feat_kind, model_name in product([NORMALIZED_INPUTS], models_list):
         exp_name = f"{model_name} {feat_kind}"
         training_data, adj = prepare_training_data(
             device=device,
             dimension_reduction=feat_kind
         )
         feat_dim = training_data[INPUTS].shape[1]
-        if model_name == "GCN":
-            model = GCN(feat_dim, adj, hdim=64)
-        elif model_name == "ChebNet":
+        if "-h=" in model_name:
+            hdim = int(model_name.split("-h=")[1].split("-")[0])
+        else:
+            hdim = 64
+        if "-dr=" in model_name:
+            dropout = float(model_name.split("-dr=")[1].split("-")[0])
+        else:
+            dropout = 0.
+        print(dropout)
+
+        if "gcn" in model_name.lower():
+            model = GCN(feat_dim, adj, hdim=hdim)
+        elif "cheb" in model_name.lower():
             model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device)
-        elif model_name == "Dense":
-            model = DenseNN(feat_dim, hdim=16)
-        elif "Single" in model_name:
-            if "-" in model_name:
-                hdim = int(model_name.split("-")[1])
-            else:
-                hdim = 64
-            model = DenseNNSingle(feat_dim, hdim=hdim)
+        elif "dense" in model_name.lower():
+            model = DenseNN(feat_dim, hdim=hdim, p_dropout=dropout)
+        elif "single" in model_name.lower():
+            model = DenseNNSingle(feat_dim, hdim=hdim, p_dropout=dropout)
         else:
             raise ValueError(f"Unknown model name {model_name}")
         model.to(device)
-        model, metrics = training_loop(model, training_data, device=device, n_epochs=1000)
+        model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs)
         metric_dict[exp_name] = metrics
         total_params = sum(p.numel() for p in model.parameters())
         print(f"Total number of parameters : {total_params}")
