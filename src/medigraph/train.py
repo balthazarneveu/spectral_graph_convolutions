@@ -11,6 +11,7 @@ from tqdm import tqdm
 #     from tqdm import tqdm
 
 from medigraph.data.properties import INPUTS, LABELS, TRAIN_MASK, VAL_MASK, TEST_MASK
+from medigraph.model.metrics import TRAIN, VALIDATION, TEST
 from typing import Tuple, Optional
 
 
@@ -27,31 +28,40 @@ def training_loop(
     criterion = torch.nn.BCEWithLogitsLoss()
     train_input = train_data[INPUTS]
     train_label = train_data[LABELS]
+
+    train_mask = train_data[TRAIN_MASK]
+    val_mask = train_data[VAL_MASK]
+    test_maks = train_data[TEST_MASK]
+
     model.to(device)
     optim = torch.optim.Adam(model.parameters(), **optimizer_params)
-    training_losses = []
-    training_accuracies = []
+    losses = {TRAIN: [], VALIDATION: [], TEST: []}
+    accuracies = {TRAIN: [], VALIDATION: [], TEST: []}
     for ep in tqdm(range(n_epochs)):
         model.train()
         optim.zero_grad()
         logit = model(train_input)
-        loss = criterion(logit, train_label)
+        # print(logit.shape)
+        # print(logit[val_mask])
+        loss = criterion(logit[train_mask], train_label[train_mask])
         loss.backward()
         optim.step()
         with torch.no_grad():
-            predicted_prob = torch.sigmoid(logit).squeeze()  # Apply sigmoid and remove extra dimensions if any
-            predicted = (predicted_prob >= 0.5).long()  # Convert probabilities to 0 or 1
-            correct = (predicted == train_label).sum().item()
-            total = train_label.shape[0]
-            accuracy = correct / total
-            training_accuracies.append(accuracy)
-        if ep % 100 == 0:
-            print(f"Epoch {ep} loss: {loss.item():10f} - accuracy: {accuracy:.2%}")
-        training_losses.append(loss.detach().cpu())
-    metrics = {
-        "training_losses": training_losses,
-        "training_accuracies": training_accuracies
-    }
+            for mode, mask in zip([TRAIN, VALIDATION, TEST], [train_mask, val_mask, test_maks]):
+                if mask is None:
+                    continue
+                loss = criterion(logit[mask], train_label[mask])
+                
+                predicted_prob = torch.sigmoid(logit[mask]).squeeze()  # Apply sigmoid and remove extra dimensions
+                predicted = (predicted_prob >= 0.5).long()  # Convert probabilities to 0 or 1
+                correct = (predicted == train_label[mask]).sum().item()
+                total = len(mask)
+                accuracy = correct / total
+                losses[mode].append(loss.detach().cpu())
+                accuracies[mode].append(accuracy)
+            if ep % 100 == 0:
+                print(f"Epoch {ep} loss: {loss.item():10f} - accuracy: {accuracy:.2%}")
+    metrics = {"loss": losses, "accuracy": accuracies}
     return model, metrics
 
 # ---- METRICS AND TEST ----
