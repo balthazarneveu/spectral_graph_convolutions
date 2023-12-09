@@ -114,6 +114,7 @@ class AbideData():
 
         return np.array(mat_feat)
 
+
     def get_metadata(self) -> pd.DataFrame:
         if not hasattr(self, "df"):
             self.df = pd.read_csv(self.metadata_path)
