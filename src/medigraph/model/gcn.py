@@ -1,9 +1,9 @@
 from typing import Optional, Union, List
 import torch
-from scipy import sparse 
+from scipy import sparse
 import numpy as np
 import torch.nn.functional as F
-from torch_geometric.nn import ChebConv 
+from torch_geometric.nn import ChebConv
 
 
 class BasicGCNDenseLayer(torch.nn.Module):
@@ -13,7 +13,7 @@ class BasicGCNDenseLayer(torch.nn.Module):
 
     def __init__(self, input_dim, output_dim, normalized_adjacency_matrix: torch.Tensor):
         super().__init__()
-        self.fc1 = torch.nn.Linear(input_dim, output_dim)
+        self.fc1 = torch.nn.Linear(input_dim, output_dim, bias=False)
         self.adj = normalized_adjacency_matrix
 
     def forward(self, inp: torch.Tensor):
@@ -33,12 +33,13 @@ class GCN(torch.nn.Module):
         adj = d_inv_sqrt @ adj @ d_inv_sqrt  # D^-1/2 A D^-1/2
         return adj
 
-    def __init__(self, input_dim, adjacency: torch.Tensor, hdim):
+    def __init__(self, input_dim, adjacency: torch.Tensor, hdim, p_dropout=0.):
         super().__init__()
         hdim1 = hdim
         hdim2 = hdim1
         output_dim = 1  # Binary classification here
         self.adj = GCN.get_normalized_adjacency_matrix(adjacency)
+        self.dropout = torch.nn.Dropout(p=p_dropout)
         self.gcn1 = BasicGCNDenseLayer(input_dim, hdim1, self.adj)
         self.gcn2 = BasicGCNDenseLayer(hdim1, hdim2, self.adj)
         self.classifier = torch.nn.Linear(hdim2, output_dim)
@@ -46,13 +47,15 @@ class GCN(torch.nn.Module):
 
     def forward(self, x: torch.Tensor):
         x = self.gcn1(x)
+        x = self.dropout(x)
         x = self.gcn2(x)
+        x = self.dropout(x)
         logit = self.classifier(x)
         return logit.squeeze()
 
 
 class SimpleGraphConvolution(torch.nn.Module):
-    def __init__(self, in_features, out_features, bias: bool=True):
+    def __init__(self, in_features, out_features, bias: bool = True):
         super().__init__()
         print(f"in_feat {in_features} out_feat {out_features}")
         self.out_features = out_features
@@ -64,29 +67,30 @@ class SimpleGraphConvolution(torch.nn.Module):
         self.fc.weight.data.uniform_(-stdv, stdv)
         if self.fc.bias:
             self.fc.bias.data.uniform_(-stdv, stdv)
-    
+
     def forward(self, x: torch.Tensor, adj: torch.Tensor):
         support = self.fc(x)
         output = torch.spmm(adj, support)
-        
+
         return output
+
 
 class SparseGCN(torch.nn.Module):
     """Graph Convolutional Network based on http://arxiv.org/abs/1609.02907"""
 
-    def get_normalized_adjacency_matrix(adj: np.array, dtype : torch.dtype=torch.float32):
+    def get_normalized_adjacency_matrix(adj: np.array, dtype: torch.dtype = torch.float32):
         """ Apply the renormalization trick 
         return a sparse matrix """
 
-        adj = adj + sparse.eye(adj.shape[0]) # warning : addition is valif if adj is a numpy.array but not if it a tensor
+        # warning : addition is valif if adj is a numpy.array but not if it a tensor
+        adj = adj + sparse.eye(adj.shape[0])
         tilde_d = np.array(1 / adj.sum(1)).flatten()
         tilde_d[np.isinf(tilde_d)] = 0.
         tilde_d = sparse.diags(tilde_d)
         adj = tilde_d.dot(adj)
 
-
         return torch.tensor(adj, dtype=dtype).to_sparse()
-    
+
     def __init__(self, nfeat: int, nhid: Union[int, List[int]], nclass: int, adjacency: np.array, proba_dropout: float = 0.5):
         super().__init__()
         assert type(adjacency) == np.ndarray, "For initialization, adjacency matrix must be an array"
@@ -108,18 +112,20 @@ class SparseGCN(torch.nn.Module):
         x = F.dropout(x, self.proba_dropout, training=self.training)
 
         for gc in self.gc_hid:
-            x = F.relu( gc(x, self.adj))
+            x = F.relu(gc(x, self.adj))
             x = F.dropout(x, self.proba_dropout, training=self.training)
 
-        x = self.gc_last(x, self.adj) # (n, nclass)
+        x = self.gc_last(x, self.adj)  # (n, nclass)
         # x = F.softmax(x, dim=1) # warning : usually for multi-class or when the loss is nnllloss
         return x
-    
+
+
 class ChebGCN(torch.nn.Module):
-    def __init__(self, in_features :int , out_features:int, 
-                 adjacency : np.ndarray,
-                 K:int =3,
-                 proba_dropout: float = 0.3):
+    def __init__(self, in_features: int, out_features: int,
+                 adjacency: np.ndarray,
+                 K: int = 3,
+                 proba_dropout: float = 0.3,
+                 device=None):
         super().__init__()
         self.proba_dropout = proba_dropout
         self.chebconv = ChebConv(in_features, out_features, K)
@@ -127,19 +133,19 @@ class ChebGCN(torch.nn.Module):
 
         self.edge_index = self.compute_edge_index()
         self.edge_weight = self.compute_edge_weight()
-
+        self.edge_index = self.edge_index.to(device)
+        self.edge_weight = self.edge_weight.to(device)
 
     def compute_edge_index(self):
         edge_index = np.array(self.adj.nonzero())
         edge_index = torch.tensor(edge_index, dtype=torch.long)
         return edge_index
-    
+
     def compute_edge_weight(self):
         edge_weight = self.adj[self.edge_index[0], self.edge_index[1]]
         return torch.tensor(edge_weight, dtype=torch.float32)
-    
+
     def forward(self, x: torch.tensor):
-        
         x = self.chebconv(x, self.edge_index, self.edge_weight)
         x = F.dropout(x, self.proba_dropout, training=self.training)
         return x
