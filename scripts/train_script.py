@@ -47,7 +47,13 @@ def train(device=DEVICE):
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
     models_list = ["Dense"]
-    for feat_kind, model_name, noise_level in product([NORMALIZED_INPUTS], models_list, [None, 0.01, 0.1, 0.3]):
+    models_list = ["GCN-dr=0.3"]
+
+    optimizer_params = {
+        "lr": 1.E-4,
+        "weight_decay": 0.1
+    }
+    for feat_kind, model_name, noise_level in product([NORMALIZED_INPUTS], models_list, [0.1, None]):
         exp_name = f"{model_name} {feat_kind}"
         if noise_level is not None:
             exp_name += f" noise={noise_level:.2f}"
@@ -67,7 +73,7 @@ def train(device=DEVICE):
             dropout = 0.
 
         if "gcn" in model_name.lower():
-            model = GCN(feat_dim, adj, hdim=hdim)
+            model = GCN(feat_dim, adj, hdim=hdim, p_dropout=dropout)
         elif "cheb" in model_name.lower():
             model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device)
         elif "dense" in model_name.lower():
@@ -77,7 +83,8 @@ def train(device=DEVICE):
         else:
             raise ValueError(f"Unknown model name {model_name}")
         model.to(device)
-        model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs, noise_level=noise_level)
+        model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs,
+                                       noise_level=noise_level, optimizer_params=optimizer_params)
         metric_dict[exp_name] = metrics
         total_params = sum(p.numel() for p in model.parameters())
         print(f"Total number of parameters : {total_params}")

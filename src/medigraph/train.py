@@ -25,6 +25,7 @@ def training_loop(
     },
     n_epochs: Optional[int] = 1000
 ) -> Tuple[torch.nn.Module, dict]:
+
     criterion = torch.nn.BCEWithLogitsLoss()
     train_input = train_data[INPUTS]
     train_label = train_data[LABELS]
@@ -35,6 +36,8 @@ def training_loop(
 
     model.to(device)
     optim = torch.optim.Adam(model.parameters(), **optimizer_params)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, 'min')
+    # scheduler = torch.optim.lr_scheduler.ExponentialLR(optim, gamma=0.999)
     losses = {TRAIN: [], VALIDATION: [], TEST: []}
     accuracies = {TRAIN: [], VALIDATION: [], TEST: []}
     for ep in tqdm(range(n_epochs)):
@@ -61,8 +64,14 @@ def training_loop(
                 accuracy = correct / total
                 losses[mode].append(loss.detach().cpu())
                 accuracies[mode].append(accuracy)
-            if ep % 100 == 0:
-                print(f"Epoch {ep} loss: {loss.item():10f} - accuracy: {accuracy:.2%}")
+        if ep % 100 == 0:
+            print(
+                f"Epoch {ep}\nloss: train {losses[TRAIN][-1]:.5f} | validation {losses[VALIDATION][-1]:.5f}" +
+                f"\naccuracy: train {accuracies[TRAIN][-1]:.2%} | validation {accuracies[VALIDATION][-1]:.2%}")
+            print("Learning rate", optim.param_groups[0]['lr'])
+        # scheduler.step(losses[VALIDATION][-1])
+        # scheduler.step()
+        
     metrics = {"loss": losses, "accuracy": accuracies}
     return model, metrics
 
