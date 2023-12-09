@@ -46,8 +46,11 @@ def train(device=DEVICE):
     models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
-    for feat_kind, model_name in product([NORMALIZED_INPUTS], models_list):
+    models_list = ["Dense"]
+    for feat_kind, model_name, noise_level in product([NORMALIZED_INPUTS], models_list, [None, 0.01, 0.1, 0.3]):
         exp_name = f"{model_name} {feat_kind}"
+        if noise_level is not None:
+            exp_name += f" noise={noise_level:.2f}"
         training_data, adj = prepare_training_data(
             device=device,
             dimension_reduction=feat_kind
@@ -59,9 +62,9 @@ def train(device=DEVICE):
             hdim = 64
         if "-dr=" in model_name:
             dropout = float(model_name.split("-dr=")[1].split("-")[0])
+            logging.info(f"Dropout {dropout:.2f}")
         else:
             dropout = 0.
-        print(dropout)
 
         if "gcn" in model_name.lower():
             model = GCN(feat_dim, adj, hdim=hdim)
@@ -74,7 +77,7 @@ def train(device=DEVICE):
         else:
             raise ValueError(f"Unknown model name {model_name}")
         model.to(device)
-        model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs)
+        model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs, noise_level=noise_level)
         metric_dict[exp_name] = metrics
         total_params = sum(p.numel() for p in model.parameters())
         print(f"Total number of parameters : {total_params}")

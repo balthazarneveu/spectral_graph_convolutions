@@ -18,7 +18,7 @@ from typing import Tuple, Optional
 def training_loop(
     model: torch.nn.Module,
     train_data: dict, device,
-    valid_data: Optional[dict] = None,
+    noise_level: Optional[float] = None,
     optimizer_params={
         "lr": 1.E-4,
         "weight_decay": 0.1
@@ -40,7 +40,11 @@ def training_loop(
     for ep in tqdm(range(n_epochs)):
         model.train()
         optim.zero_grad()
-        logit = model(train_input)
+        if noise_level is not None:
+            train_input_noisy = train_input + noise_level * torch.randn_like(train_input)
+        else:
+            train_input_noisy = train_input
+        logit = model(train_input_noisy)
         loss = criterion(logit[train_mask], train_label[train_mask])
         loss.backward()
         optim.step()
@@ -50,7 +54,6 @@ def training_loop(
                 if mask is None:
                     continue
                 loss = criterion(logit[mask], train_label[mask])
-
                 predicted_prob = torch.sigmoid(logit[mask]).squeeze()  # Apply sigmoid and remove extra dimensions
                 predicted = (predicted_prob >= 0.5).long()  # Convert probabilities to 0 or 1
                 correct = (predicted == train_label[mask]).sum().item()
