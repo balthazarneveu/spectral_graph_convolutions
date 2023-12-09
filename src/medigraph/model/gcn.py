@@ -91,10 +91,10 @@ class SparseGCN(torch.nn.Module):
 
         return torch.tensor(adj, dtype=dtype).to_sparse()
 
-    def __init__(self, nfeat: int, nhid: Union[int, List[int]], nclass: int, adjacency: np.array, proba_dropout: float = 0.5):
+    def __init__(self, nfeat: int, nhid: Union[int, List[int]], nclass: int, adjacency: np.array, proba_dropout: float = 0.5, device="cpu"):
         super().__init__()
         assert type(adjacency) == np.ndarray, "For initialization, adjacency matrix must be an array"
-        self.adj = SparseGCN.get_normalized_adjacency_matrix(adjacency)
+        self.adj = SparseGCN.get_normalized_adjacency_matrix(adjacency).to(device)
         if isinstance(nhid, int):
             nhid = [nhid]
         self.gc_first = SimpleGraphConvolution(nfeat, nhid[0], bias=False)
@@ -125,6 +125,8 @@ class ChebGCN(torch.nn.Module):
                  adjacency: np.ndarray,
                  K: int = 3,
                  proba_dropout: float = 0.3,
+                 trim=None,
+                 decimate=None,
                  device=None):
         super().__init__()
         self.proba_dropout = proba_dropout
@@ -134,7 +136,16 @@ class ChebGCN(torch.nn.Module):
         self.edge_index = self.compute_edge_index()
         self.edge_weight = self.compute_edge_weight()
         self.edge_index = self.edge_index.to(device)
+        
+        if trim is not None:
+            self.edge_index = self.edge_index[:, :trim]
+        if decimate is not None:
+            self.edge_index = self.edge_index[:, ::decimate]
         self.edge_weight = self.edge_weight.to(device)
+        if trim is not None:
+            self.edge_weight = self.edge_weight[:trim]
+        if decimate is not None:
+            self.edge_weight = self.edge_weight[::decimate]
 
     def compute_edge_index(self):
         edge_index = np.array(self.adj.nonzero())
@@ -148,4 +159,4 @@ class ChebGCN(torch.nn.Module):
     def forward(self, x: torch.tensor):
         x = self.chebconv(x, self.edge_index, self.edge_weight)
         x = F.dropout(x, self.proba_dropout, training=self.training)
-        return x
+        return x.squeeze()
