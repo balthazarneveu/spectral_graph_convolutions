@@ -4,7 +4,10 @@ from medigraph.data.abide import AbideData
 from medigraph.model.gcn import GCN, ChebGCN
 from medigraph.model.baseline import DenseNN, DenseNNSingle
 import torch
-from medigraph.data.properties import INPUTS, LABELS, ADJ, RFE_DIM_REDUCTION, TRAIN_MASK, VAL_MASK, TEST_MASK, NORMALIZED_INPUTS
+from medigraph.data.properties import (
+    INPUTS, LABELS, ADJ, RFE_DIM_REDUCTION, TRAIN_MASK, VAL_MASK, TEST_MASK, NORMALIZED_INPUTS
+)
+import argparse
 from medigraph.model.metrics import plot_metrics
 import logging
 from itertools import product
@@ -12,7 +15,7 @@ from itertools import product
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def prepare_training_data(device=DEVICE, dimension_reduction=None, keep_frozen_masks=True):
+def prepare_training_data(device=DEVICE, dimension_reduction=None, keep_frozen_masks=True, seed=42):
     dat = AbideData()
     data_dict = dat.get_training_data(dimension_reduction=dimension_reduction)
     adj_np = data_dict[ADJ]
@@ -34,38 +37,40 @@ def prepare_training_data(device=DEVICE, dimension_reduction=None, keep_frozen_m
         TEST_MASK: data_dict[TEST_MASK]
     }
     if not keep_frozen_masks:
-        train_mask, val_mask, test_mask = dat.get_mask(train_ratio=0.8, val_ratio=0.1)
+        train_mask, val_mask, test_mask = dat.get_mask(train_ratio=0.8, val_ratio=0.1, seed=seed)
         training_data[TRAIN_MASK] = train_mask
         training_data[VAL_MASK] = val_mask
         training_data[TEST_MASK] = test_mask
     return training_data, adj
 
 
-def train(device=DEVICE):
+def train(device=DEVICE, n_epochs=1000):
 
     metric_dict = {}
     # for feat_kind, model_name in product([RFE_DIM_REDUCTION, NORMALIZED_INPUTS], ["Dense", "GCN"]):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Dense", "Single"]):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["GCN",]):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]):
-    n_epochs = 1000
     models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
     models_list = ["Dense"]
-    models_list = ["GCN", "GCN-dr=0.3"]
-    models_list = ["Cheb-dr=0.3"]
+    # models_list = ["GCN", "GCN-dr=0.3"]
+    # models_list = ["Cheb-dr=0.3"]
     optimizer_params = {
         "lr": 1.E-4,
         "weight_decay": 0.1
     }
-    for feat_kind, model_name, noise_level in product([RFE_DIM_REDUCTION], models_list, [0.1, None]):
+    # noise_levels_list = [0.1, None]
+    noise_levels_list = [None]
+    for feat_kind, model_name, noise_level in product([RFE_DIM_REDUCTION], models_list, noise_levels_list):
         exp_name = f"{model_name} {feat_kind}"
         if noise_level is not None:
             exp_name += f" noise={noise_level:.2f}"
         training_data, adj = prepare_training_data(
             device=device,
-            dimension_reduction=feat_kind
+            dimension_reduction=feat_kind,
+            keep_frozen_masks=False
         )
         feat_dim = training_data[INPUTS].shape[1]
         if "-h=" in model_name:
@@ -89,15 +94,24 @@ def train(device=DEVICE):
             model = DenseNNSingle(feat_dim, hdim=hdim, p_dropout=dropout)
         else:
             raise ValueError(f"Unknown model name {model_name}")
+        total_params = sum(p.numel() for p in model.parameters())
+        logging.info(f"Total number of parameters : {total_params}")
+
         model.to(device)
         model, metrics = training_loop(model, training_data, device=device, n_epochs=n_epochs,
                                        noise_level=noise_level, optimizer_params=optimizer_params)
         metric_dict[exp_name] = metrics
-        total_params = sum(p.numel() for p in model.parameters())
-        print(f"Total number of parameters : {total_params}")
-        logging.info(total_params)
+
     plot_metrics(metric_dict)
 
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--device", type=str, choices=["cpu", "cuda"], default="cuda")
+    parser.add_argument("-n", "--n-epochs", type=int, default=1000)
+    args = parser.parse_args()
+    train(device=args.device, n_epochs=args.n_epochs)
+
+
 if __name__ == "__main__":
-    train()
+    main()
