@@ -1,24 +1,24 @@
-\documentclass[sigconf]{acmart}
-
+\documentclass[sigconf,authorversion,nonacm]{acmart}
 \input{shortcuts.sty}
 \usepackage{subcaption}
 \settopmatter{printfolios=true}
+\settopmatter{printacmref=false}
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     Bib\TeX}}}
 
+\setcopyright{None}
+\settopmatter{printacmref=false}
 
-
-\setcopyright{acmcopyright}
-\copyrightyear{2023}
-\acmYear{2023}
+% \setcopyright{acmcopyright}
+% \copyrightyear{2023}
+% \acmYear{2023}
 % \acmDOI{XXXXXXX.XXXXXXX}
 
 %% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[MVA 2023]{MVA 2023}{December
-  2023}{Paris, FR}
+\acmConference[MVA 2023]{MVA 2023}{December 2023}{Paris, FR}
 
 % \acmPrice{15.00}
 % \acmISBN{978-1-4503-XXXX-X/18/06}
@@ -34,18 +34,16 @@
 %% AUTHORS
 \author{Manal Akhannous}
 \affiliation{%
-  \institution{ENPC}
-  \streetaddress{Cité Descartes, 8 Av Blaise Pascal}
-  \city{Champs-sur-Marne}
+  \institution{ENS Paris-Saclay}
+  \city{Saclay}
   \country{France}
 }
 \email{manal.akhannous@eleves.enpc.fr}
 
 \author{Ines Vati}
 \affiliation{%
-  \institution{ENPC}
-  \streetaddress{Cité Descartes, 8 Av Blaise Pascal 6 et}
-  \city{Champs-sur-Marne}
+  \institution{ENS Paris-Saclay}
+  \city{Saclay}
   \country{France}
 }
 \email{ines.vati@eleves.enpc.fr}
@@ -59,14 +57,32 @@
 \email{balthazar.neveu@ens-paris-saclay.fr}
 
 
-\renewcommand{\shortauthors}{MVA et al.}
+\renewcommand{\shortauthors}{Akhannous, Vati, Neveu}
 
 %% ABSTRACT
 \begin{abstract}
-  We'll review the paper Spectral Graph Convolutions for Population-based Disease Prediction \cite{Parisot17}
+We propose a review of \textit{Spectral Graph Convolutions for Population-based Disease Prediction} \cite{Parisot17},
+a research paper published in 2017 which introduced the use of Graph Convolutional Networks (GCN)
+to the domain of brain-related disorders classification in populations.
+We conducted experiments on the ABIDE dataset to reproduce and challenge the results of the paper.
+We paid attention to make it reproducible and our code is available on \href{https://github.com/balthazarneveu/spectral_graph_convolutions}{Github}
 
 \end{abstract}
 
+\begin{teaserfigure}
+  \includegraphics[width=\textwidth]{figures/spectral_graph_convolution_graph_overview.png}
+  \caption{Overview of the use of graph convolutional networks to predict ASD (autism spectrum disorder).
+  The ABIDE dataset was created to study autism and contains a set of functional MRI from 871 patients 
+  of different genders and captured over 17 different sites with different f-MRI devices. Input data is scarce and not totally homogeneous.
+  On the left, the creation of the content of a single node is shown. 111 temporal series are extracted from the f-MRI 
+  and correlation allows to create a connectivity 111x111 symmetric matrix of the brain of each patient.
+  A population graph is created by connecting each patient (node) to the other patients with an edge weighted by the similarity between the patients.
+  It is proessed by a graph convolutional network to predict the ASD status of each patient.
+  Nodes are partially labeled to split the dataset between training, validation and test set.
+  }
+  \Description{}
+  \label{fig:overview}
+\end{teaserfigure}
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
