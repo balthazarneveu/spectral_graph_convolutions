@@ -55,9 +55,10 @@ def train(device=DEVICE, n_epochs=1000, output_folder=Path("results")):
     # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]):
     models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
-    models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16", "Dense", "Single-h=128"]
+    # models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16", "Dense", "Single-h=128"]
     # models_list = ["Single-h=1"]
     # models_list = ["Dense"]
+    models_list = ["GCN-dr=0.1",]
     # models_list = ["GCN", "GCN-dr=0.3"]
     # models_list = ["Cheb-dr=0.3"]
     optimizer_params = {

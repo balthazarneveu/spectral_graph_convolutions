@@ -37,18 +37,22 @@ class GCN(torch.nn.Module):
         super().__init__()
         hdim1 = hdim
         hdim2 = hdim1
+        hdim3 = hdim2
         output_dim = 1  # Binary classification here
         self.adj = GCN.get_normalized_adjacency_matrix(adjacency)
         self.dropout = torch.nn.Dropout(p=p_dropout)
         self.gcn1 = BasicGCNDenseLayer(input_dim, hdim1, self.adj)
         self.gcn2 = BasicGCNDenseLayer(hdim1, hdim2, self.adj)
+        self.gcn3 = BasicGCNDenseLayer(hdim2, hdim3, self.adj)
         self.classifier = torch.nn.Linear(hdim2, output_dim)
         self.classifier2 = torch.nn.Linear(input_dim, output_dim)
 
     def forward(self, x: torch.Tensor):
         x = self.gcn1(x)
         x = self.dropout(x)
-        x = self.gcn2(x)
+        x = self.gcn2(x) + x
+        x = self.dropout(x)
+        x = self.gcn3(x) + x
         x = self.dropout(x)
         logit = self.classifier(x)
         return logit.squeeze()
