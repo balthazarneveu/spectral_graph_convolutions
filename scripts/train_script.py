@@ -46,21 +46,9 @@ def prepare_training_data(device=DEVICE, dimension_reduction=None, keep_frozen_m
     return training_data, adj
 
 
-def train(device=DEVICE, n_epochs=1000, output_folder=Path("results")):
+def train(models_list=["Dense", "GCN"], device=DEVICE, n_epochs=1000, output_folder=Path("results")):
     output_folder.mkdir(exist_ok=True, parents=True)
     metric_dict = {}
-    # for feat_kind, model_name in product([RFE_DIM_REDUCTION, NORMALIZED_INPUTS], ["Dense", "GCN"]):
-    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Dense", "Single"]):
-    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["GCN",]):
-    # for feat_kind, model_name in product([NORMALIZED_INPUTS], ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]):
-    models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
-    models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
-    # models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16", "Dense", "Single-h=128"]
-    # models_list = ["Single-h=1"]
-    # models_list = ["Dense"]
-    models_list = ["GCN-dr=0.1",]
-    # models_list = ["GCN", "GCN-dr=0.3"]
-    # models_list = ["Cheb-dr=0.3"]
     optimizer_params = {
         "lr": 1.E-4,
         "weight_decay": 0.1
@@ -103,8 +91,8 @@ def train(device=DEVICE, n_epochs=1000, output_folder=Path("results")):
             if "gcn" in model_name.lower():
                 model = GCN(feat_dim, adj, hdim=hdim, p_dropout=dropout)
             elif "cheb" in model_name.lower():
-                # model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout)
                 model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout)
+                # model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout, decimate=8)
             elif "dense" in model_name.lower():
                 model = DenseNN(feat_dim, hdim=hdim, p_dropout=dropout)
             elif "single" in model_name.lower():
@@ -121,16 +109,29 @@ def train(device=DEVICE, n_epochs=1000, output_folder=Path("results")):
             )
             metric_dict[exp_name][f"seed={seed}"] = metrics
         Dump.save_pickle(metric_dict[exp_name], out_exp_path)
-    plot_metrics(metric_dict)
+    return metric_dict
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--device", type=str, choices=["cpu", "cuda"], default="cuda")
-    parser.add_argument("-n", "--n-epochs", type=int, default=1000)
-    parser.add_argument("-o", "--output-folder", type=str, default="results")
+    models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
+    models_list = ["GCN-dr=0.1",]
+    # models_list = ["GCN", "GCN-dr=0.3"]
+    models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16", "Dense", "Single-h=128", "GCN-dr=0.1",]
+    # models_list = ["Cheb-dr=0.3"]
+
+    parser = argparse.ArgumentParser(description="Train classification models on Abide dataset - compare performances")
+    parser.add_argument("-d", "--device", type=str, choices=["cpu", "cuda"], default="cuda", help="Training device")
+    parser.add_argument("-n", "--n-epochs", type=int, default=1000, help="Number of epochs")
+    parser.add_argument("-o", "--output-folder", type=str, default="results", help="Output results folder"),
+    parser.add_argument("-m", "--models-list", nargs="+", default=models_list, help="List of models to train")
     args = parser.parse_args()
-    train(device=args.device, n_epochs=args.n_epochs, output_folder=Path(args.output_folder))
+    metric_dict = train(
+        models_list=args.models_list,
+        device=args.device,
+        n_epochs=args.n_epochs,
+        output_folder=Path(args.output_folder)
+    )
+    plot_metrics(metric_dict)
 
 
 if __name__ == "__main__":
