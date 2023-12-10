@@ -14,16 +14,16 @@ They defined the feature vector $x(v)$ of each patient $v$ as the vectorized for
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.45\textwidth]{figures/ex_connectivity_matrix.png}
-    \caption{Connectivity matrix of a given subject.} ach brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
+    \caption{Connectivity matrix of a given subject.} Each brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
     \Description{}
     \label{fig:connectivity_matrix}
 \end{figure}
-The connectome, often described as the \textit{wiring diagram} of the brain, encapsulates the intricate web of connections between different brain regions. In figure \ref{fig:connectome}, we depict the brain graph associated with the connectivity matrix computed in figure \ref{fig:connectivity_matrix}. The coordinate of brain regions are derived from the Harvard-Oxford atlas\footnote{http://preprocessed-connectomes-project.org/abide/Pipelines.html} which defines a mask comprising 111 regions of interest (ROIs).
+The connectome encapsulates the intricate web of connections between different brain regions. In figure \ref{fig:connectome}, we depict the brain graph associated with the connectivity matrix computed in figure \ref{fig:connectivity_matrix}. The coordinate of brain regions are derived from the Harvard-Oxford atlas\footnote{http://preprocessed-connectomes-project.org/abide/Pipelines.html} which defines a mask comprising 111 regions of interest (ROIs).
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.45\textwidth]{figures/ex_brain_connectivity.png}
-    \caption{Connectome graph of a given patient}  Each node represents a specific brain region and edges correspond to the connectivity between two regions as plotted in figure \ref*{fig:connectivity_matrix}. This representation offers a unique insight into the patient's neural architecture, shedding light on the potential correlates of cognitive processes, as well as providing valuable information for understanding the impact of neurological conditions. Note that the exact values of the edges weights were multiplied by 50 to improve the readability of the figure.
+    \caption{Connectome graph of a given patient}  Each node represents a specific brain region and edges correspond to the connectivity between two regions as plotted in figure \ref{fig:connectivity_matrix}. This representation offers a unique insight into the patient's neural architecture, shedding light on the potential correlates of cognitive processes, as well as providing valuable information for understanding the impact of neurological conditions. Note that the exact values of the edges weights were multiplied by 50 to improve the readability of the figure.
     \Description{}
     \label{fig:connectome}
 \end{figure}
