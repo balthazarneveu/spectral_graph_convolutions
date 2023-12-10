@@ -37,7 +37,7 @@ def plot_metrics(metric_dict: dict) -> None:
         ```
     """
     fig, axs = plt.subplots(1, 3, figsize=(10, 6))
-    colors = ["b", "g", "r", "y", "k"]
+    colors = ["b", "g", "r", "y", "m", "c", "k"]
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
         color = colors[idx % len(colors)]
@@ -57,9 +57,11 @@ def plot_metrics(metric_dict: dict) -> None:
                         label=None if seed_idx >= 1 else (f"{model_name} VALIDATION accuracy"))
             axs[2].plot(current_metric[ACCURACY][TEST], color+"-",
                         # linewidth=2,
-                        alpha=0.2,
+                        alpha=0.1,
                         label=None if seed_idx >= 1 else (f"{model_name} TEST accuracy"))
-        acc_test = np.array([current_metric[ACCURACY][TEST] for seed in metric.keys()]).mean(axis=0)
+    for idx, (model_name, metric) in enumerate(metric_dict.items()):
+        color = colors[idx % len(colors)]
+        acc_test = np.array([metric[seed][ACCURACY][TEST]for seed in metric.keys()]).mean(axis=0)
         axs[2].plot(
             acc_test,
             color+"-",
