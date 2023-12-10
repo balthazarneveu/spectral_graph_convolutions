@@ -29,7 +29,7 @@ They defined the feature vector $x(v)$ of each patient $v$ as the vectorized for
     \begin{subfigure}{0.3\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/ex_connectivity_matrix_sbl_ASD.png}
-        \caption{Patient with ASD in SBL acquisition site}
+        \caption{\centering Patient with ASD in SBL acquisition site \qquad }
         \Description{}
     \end{subfigure}
     \caption{Connectivity matrix of given subjects.} Each brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
@@ -104,7 +104,7 @@ The graph Laplacian $\mathbf{L}$ is a real symmetric matrix, it has therefore re
 We denote their associated  orthonormal eigenvectors by $\{u_l\}_{l=0,\dots, N-1}$. In the following, $\Lambda$ and $U$ denote the diagonal matrix of eigenvalues and the matrix of eigenvectors, respectively.
 
 Since we consider connected graphs, the eigenvalue $\lambda_0=0$ has multiplicity $1$  \cite{shuman_emerging_2013}. 
-\textit{(There are as many null eigen values as there are connected components in the graph.)}
+%\textit{(There are as many null eigen values as there are connected components in the graph.)}
 
 A popular practice is to normalize each weight $W_{i, j}$ by a factor of $\frac{1}{\sqrt{d_id_j}}$.
 Doing so leads to the normalized graph Laplacian, which is defined as $\widetilde{\mathbf{L}} = D^{-1/2}\mathbf{L}D^{-1/2} = I_N - D^{-1/2}\mathbf{W}D^{-1/2}$. This strategy is used to improve the stability of gradient flow during backpropagation in neural networks. This can be valuable in mitigating the vanishing gradient problem and facilitating the training of deeper and more expressive models on graph data.
