@@ -33,10 +33,15 @@ $$
 where $sign$ is a function that return $1$ if the input is positive, $-1$ if the input is negative, and $0$ if the input is zero.
 % The Ridge penalty term, $\alpha \lVert w \rVert_2^2$, penalizes large values of the weights, encouraging a more generalizable model and helping to mitigate overfitting.
 
-The recursive feature elimination (RFE) is employed to iteratively select features by progessively considering smaller sets of features. Initially, the estimator is trained on the complete set of features, and the importance of each feature $i$ is determined by evaluating the weights assigned in the Ridge esimator $\hat{\beta}_i$. Subsequently, the least important features are pruned from current set and this process is repeated recursively repeated on the pruned set until the desired number of selected features is reached.
-
+The recursive feature elimination (RFE) is employed to iteratively select features by progessively considering smaller sets of features. Initially, the estimator is trained on the complete set of features, and the importance of each feature $i$ is determined by evaluating the weights assigned in the Ridge esimator $\hat{\beta}_i$ as illustrated in figure \ref{fig:rfe}. Subsequently, the least important features are pruned from current set and this process is repeated recursively repeated on the pruned set until the desired number of selected features is reached.
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/rfe.png}
+    \caption{Relative importance of features for recursive elimination}
+    \label{fig:rfe}
+    \Description{}
+\end{figure*}
 
 \subsection{Dimensionality reduction by Autoencoder}
 
 
-\end{document}
