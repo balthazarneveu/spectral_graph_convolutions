@@ -11,18 +11,37 @@ It is based on the principle that different regions of the brain exhibit correla
 The authors \cite{Parisot17} proposed to construct a population graph integrating imaging and non-imaging data. 
 They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. The figure \ref{fig:connectivity_matrix} display the connectivity matrix obtained for one of the patient in the ABIDE dataset. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}.  
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=0.45\textwidth]{figures/ex_connectivity_matrix.png}
-    \caption{Connectivity matrix of a given subject.} Each brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
+\begin{figure*}[h!]
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/ex_connectivity_matrix_pitt_ASD.png}
+        \caption{\centering Patient with ASD in PITT acquisition site} 
+        \Description{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/ex_connectivity_matrix_pitt_H.png}
+        \caption{\centering Patient without ASD in PITT acquisition site} 
+        \Description{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.3\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/ex_connectivity_matrix_sbl_ASD.png}
+        \caption{Patient with ASD in SBL acquisition site}
+        \Description{}
+    \end{subfigure}
+    \caption{Connectivity matrix of given subjects.} Each brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
     \Description{}
     \label{fig:connectivity_matrix}
-\end{figure}
+\end{figure*}
+
 The connectome encapsulates the intricate web of connections between different brain regions. In figure \ref{fig:connectome}, we depict the brain graph associated with the connectivity matrix computed in figure \ref{fig:connectivity_matrix}. The coordinate of brain regions are derived from the Harvard-Oxford atlas\footnote{http://preprocessed-connectomes-project.org/abide/Pipelines.html} which defines a mask comprising 111 regions of interest (ROIs).
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.45\textwidth]{figures/ex_brain_connectivity.png}
+    \includegraphics[width=0.45\textwidth]{figures/ex_connectivity_pitt_ASD.png}
     \caption{Connectome graph of a given patient}  Each node represents a specific brain region and edges correspond to the connectivity between two regions as plotted in figure \ref{fig:connectivity_matrix}. This representation offers a unique insight into the patient's neural architecture, shedding light on the potential correlates of cognitive processes, as well as providing valuable information for understanding the impact of neurological conditions. Note that the exact values of the edges weights were multiplied by 50 to improve the readability of the figure.
     \Description{}
     \label{fig:connectome}
