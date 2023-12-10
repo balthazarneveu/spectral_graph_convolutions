@@ -86,6 +86,8 @@ def train_multiple_configurations(
             logging.info(f"Skipping {exp_name}")
             metric_dict[exp_name] = Dump.load_pickle(out_exp_path)
             continue
+        else:
+            logging.warning(f"Training {exp_name}")
 
         for seed in seeds_list:
             # exp_name += f"seed={seed}"
