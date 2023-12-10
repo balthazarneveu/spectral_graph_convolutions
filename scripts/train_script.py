@@ -3,7 +3,7 @@ from medigraph.data.properties import (
     RFE_DIM_REDUCTION, RAW_INP, NORMALIZED_INPUTS
 )
 import argparse
-from medigraph.model.metrics import plot_metrics
+from medigraph.model.metrics import plot_metrics, analyze_metrics
 from medigraph.train_multiple_models import train_multiple_configurations as train
 import torch
 
@@ -15,7 +15,7 @@ def main():
     models_list = ["GCN-dr=0.1",]
     # models_list = ["GCN", "GCN-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16", "Dense", "Single-h=128", "GCN-dr=0.1",]
-    # models_list = ["Cheb-dr=0.3"]
+    models_list += ["Cheb-dr=0.3"]
 
     parser = argparse.ArgumentParser(description="Train classification models on Abide dataset - compare performances")
     parser.add_argument("-d", "--device", type=str,
@@ -34,6 +34,7 @@ def main():
         features_selection_list=args.features_selection,
         output_folder=Path(args.output_folder)
     )
+    analyze_metrics(metric_dict)
     plot_metrics(metric_dict)
 
 
