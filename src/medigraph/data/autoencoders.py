@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 class AutoEncoder(nn.Module):
     def __init__(self, input_dim, bottleneck_dim):
         super(AutoEncoder, self).__init__()
-        self.fc_encoder = nn.Linear(input_dim, bottleneck_dim)
-        self.fc_decoder = nn.Linear(bottleneck_dim, input_dim),
+        self.fc_encoder = nn.Linear(input_dim, bottleneck_dim, dtype = torch.float32)
+        self.fc_decoder = nn.Linear(bottleneck_dim, input_dim, dtype = torch.float32)
                   
     def forward(self, x):
         x = self.fc_encoder(x)
@@ -40,8 +40,8 @@ def get_loader(train_dataset, batch_size=64, num_workers=1, mode='train'):
 
 def training_loop(
     model: torch.nn.Module,
+    X,
     device,
-    X_train = None,
     optimizer_params={
         "lr": 1.E-3,
         "weight_decay": 0.001
@@ -50,7 +50,7 @@ def training_loop(
     batch_size: Optional[int] = 256,
 ) -> Tuple[torch.nn.Module, dict]:
     
-    inp_train, inp_test = train_test_split(X_train, test_size=0.1, random_state=42)
+    inp_train, inp_test = train_test_split(X, test_size=0.1, random_state=42)
 
     criterion = torch.nn.MSELoss()
     train_input = inp_train
@@ -65,7 +65,7 @@ def training_loop(
     for ep in tqdm(range(n_epochs)):
         model.train()
         for batch_data in train_loader:
-            batch_data = batch_data.to(device)
+            batch_data = batch_data.to(device, dtype = torch.float32)
             optim.zero_grad()
             output = model(batch_data)
             loss = criterion(batch_data, output)
@@ -81,7 +81,7 @@ def training_loop(
             i = 0
             for val_batch_data in val_loader:
                 i += 1
-                val_batch_data = val_batch_data.to(device)
+                val_batch_data = val_batch_data.to(device, dtype = torch.float32)
                 val_output = model(val_batch_data)
                 val_loss = criterion(val_batch_data, val_output)
                 validation_losses.append(val_loss.item())

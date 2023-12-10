@@ -1,6 +1,6 @@
 from pathlib import Path
 from medigraph.data.properties import (
-    RFE_DIM_REDUCTION, RAW_INP, NORMALIZED_INPUTS
+    RFE_DIM_REDUCTION, AE_DIM_REDUCTION, RAW_INP, NORMALIZED_INPUTS
 )
 import argparse
 from medigraph.model.metrics import plot_metrics, analyze_metrics
@@ -24,8 +24,8 @@ def main():
     parser.add_argument("-n", "--n-epochs", type=int, default=1000, help="Number of epochs")
     parser.add_argument("-o", "--output-folder", type=str, default="results", help="Output results folder"),
     parser.add_argument("-m", "--models-list", nargs="+", default=models_list, help="List of models to train")
-    parser.add_argument("-f", "--features-selection", nargs="+", default=[RFE_DIM_REDUCTION],
-                        choices=[RFE_DIM_REDUCTION, NORMALIZED_INPUTS, RAW_INP],
+    parser.add_argument("-f", "--features-selection", nargs="+", default=[AE_DIM_REDUCTION],
+                        choices=[RFE_DIM_REDUCTION, NORMALIZED_INPUTS, RAW_INP, AE_DIM_REDUCTION],
                         help="List of input feature reduction methods")
     args = parser.parse_args()
     metric_dict = train(
