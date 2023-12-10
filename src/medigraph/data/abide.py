@@ -114,6 +114,7 @@ class AbideData():
 
         return np.array(mat_feat)
 
+
     def get_metadata(self) -> pd.DataFrame:
         if not hasattr(self, "df"):
             self.df = pd.read_csv(self.metadata_path)
@@ -214,9 +215,21 @@ class AbideData():
         data_dict[ADJ] = self.get_graph_adjacency()  # [V, V]
         return data_dict
 
-    def get_mask(self, train_ratio: float = 0.9, val_ratio: float = 0.1):
+    def get_mask(self, train_ratio: float = 0.9, val_ratio: float = 0.1, seed=42
+                 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Generate random masks (indexes) for train, val and test sets
+
+
+        Args:
+            train_ratio (float, optional): Amount of training data. Defaults to 0.9.
+            val_ratio (float, optional):  Amount of validation data. Defaults to 0.1.
+            seed (int, optional): Random seed to reproduce results accross experiments. Defaults to 42.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray, np.ndarray]: train_mask, val_mask, test_mask
+        """
         N = self.n_patients
-        np.random.seed(42)
+        np.random.seed(seed)
         nb_train = round(N*train_ratio)  # 784
         nb_val = round(N*val_ratio)  # 87
         random_selection_index = np.random.permutation(N)

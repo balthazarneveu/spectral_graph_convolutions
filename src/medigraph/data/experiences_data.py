@@ -22,8 +22,8 @@ def get_training_dict_exp1(data : AbideData,
     
     else:
 
-        signals, labels, adj = data.get_training_data(override=override)  
-
+        data_dict = data.get_training_data(override=override, dimension_reduction="raw_inputs")  
+        signals, labels, adj = data_dict[INPUTS], data_dict[LABELS], data_dict[ADJ]
         clean_inp = sanitize_data(torch.tensor(signals))
         inp = np.array(whiten(clean_inp))
 
