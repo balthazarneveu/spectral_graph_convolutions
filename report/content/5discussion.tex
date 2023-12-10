@@ -13,14 +13,15 @@ In order to compare several methods (architecture, feature selection), we train 
 \end{itemize}
 
 
-\subsection{Result on using reduced features}
+\subsection{Results on using reduced features}
+
 In line with the methodology outlined in the original paper, we systematically selected a subset of $2000$ features with the RFE algorithm trained on a subset of 300 samples.
 \ref{fig:results_feature_reduction}  in none of the cases, the use of RFE significantly improves the performance of the model.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/performances_fully_connected_RFE.png}
-    \caption{No significant difference in performance between using all features and using a subset of 2000 features selected with RFE, no matter the number of neurons in the hidden layer.}
+    \caption{No significant differences in performance between using all features and using a subset of 2000 features selected with RFE, no matter the number of neurons in the hidden layer.}
     \Description{}
     \label{fig:results_feature_reduction}
 \end{figure}
@@ -44,7 +45,7 @@ In line with the methodology outlined in the original paper, we systematically s
 	\label{table:dependance_on_feature_extraction_method}
 \end{table*}
 
-Despite the diverse setups tested, it is noteworthy that these configurations did not yield significantly different performances on the test data. Furthermore, the reduction of features through Recursive Feature Elimination (RFE) did not demonstrate any discernible improvement in performance.
+Despite the varied configurations tested, it is notable that these setups did not result in significant differences in performance on the test data. Furthermore, the reduction of features through Recursive Feature Elimination (RFE) did not demonstrate any discernible improvement in performance.
 
 \subsection{Comparison of methods}
 
