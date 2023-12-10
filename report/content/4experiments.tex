@@ -1,10 +1,10 @@
 \section{Experiments}
 
 \subsection{Proposed Modifications}
-We scrutinized various aspects of the methodology, including:
+We studied various aspects of the methodology, including:
 \begin{enumerate}
     \item The relevance of dimensionality reduction applied to features before training the neural networks.
-    \item The rationale for opting for a graph-based classification approach rather than a simple dense network operating on the vectorized feature vectors.
+    \item The approach of choosing a graph-based classification approach rather than a simple dense network operating on the vectorized feature vectors.
 \end{enumerate}
 As a result, we explored different techniques for dimensionality reduction and various classification models. We devised the following experiments to address these inquiries.
 
@@ -33,7 +33,7 @@ $$
 where $sign$ is a function that return $1$ if the input is positive, $-1$ if the input is negative, and $0$ if the input is zero.
 % The Ridge penalty term, $\alpha \lVert w \rVert_2^2$, penalizes large values of the weights, encouraging a more generalizable model and helping to mitigate overfitting.
 
-The recursive feature elimination (RFE) is employed to iteratively select features by progessively considering smaller sets of features. Initially, the estimator is trained on the complete set of features, and the importance of each feature $i$ is determined by evaluating the weights assigned in the Ridge esimator $\hat{\beta}_i$ as illustrated in figure \ref{fig:rfe}. Subsequently, the least important features are pruned from current set and this process is repeated recursively repeated on the pruned set until the desired number of selected features is reached.
+The recursive feature elimination (RFE) is employed to iteratively select features by progressively considering smaller sets of features. Initially, the estimator is trained on the complete set of features, and the importance of each feature $i$ is determined by evaluating the weights assigned to the Ridge estimator $\hat{\beta}_i$. Subsequently, the least important features are pruned from the current set and this process is repeated recursively on the pruned set until the desired number of features to select is reached.
 \begin{figure*}[t!]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/rfe.png}
@@ -43,5 +43,4 @@ The recursive feature elimination (RFE) is employed to iteratively select featur
 \end{figure*}
 
 \subsection{Dimensionality reduction by Autoencoder}
-
 
