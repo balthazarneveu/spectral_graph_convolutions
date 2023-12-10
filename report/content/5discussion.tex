@@ -5,13 +5,17 @@ We train
 
 \subsection{Result of DenseNN on original features}
 
-\begin{figure*}[h!]
+\begin{figure}[h!]
     \centering
     \includegraphics[width=0.45\textwidth]{figures/model_performances_architecture.png}
-    \caption{Classification accuracy}
+    \caption{Classification accuracy: comparison of different architectures.
+    Single architectures are composed of a single hidden layer with a given number of neurons $h$.
+    \textit{Dense} architecture refer to a fully connected neural network with a single hidden layer.
+    \textit{Cheb} architectures refer to the graph convolution architecture, we vary the dropout rate $dr$
+    during training.}
     \Description{}
     \label{fig:results_architecture}
-\end{figure*}
+\end{figure}
 
 \begin{table}[H]
 	\begin{center}
