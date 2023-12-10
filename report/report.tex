@@ -1,24 +1,24 @@
-\documentclass[sigconf]{acmart}
-
+\documentclass[sigconf,authorversion,nonacm]{acmart}
 \input{shortcuts.sty}
 \usepackage{subcaption}
 \settopmatter{printfolios=true}
+\settopmatter{printacmref=false}
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     Bib\TeX}}}
 
-
+\setcopyright{None}
+\settopmatter{printacmref=false}
 
 % \setcopyright{acmcopyright}
-\copyrightyear{2023}
-\acmYear{2023}
+% \copyrightyear{2023}
+% \acmYear{2023}
 % \acmDOI{XXXXXXX.XXXXXXX}
 
 %% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[MVA 2023]{MVA 2023}{December
-  2023}{Paris, FR}
+\acmConference[MVA 2023]{MVA 2023}{December 2023}{Paris, FR}
 
 % \acmPrice{15.00}
 % \acmISBN{978-1-4503-XXXX-X/18/06}
@@ -61,7 +61,11 @@
 
 %% ABSTRACT
 \begin{abstract}
-  We'll review the paper Spectral Graph Convolutions for Population-based Disease Prediction \cite{Parisot17}
+We propose a review of \textit{Spectral Graph Convolutions for Population-based Disease Prediction} \cite{Parisot17},
+a research paper published in 2017 which introduced the use of Graph Convolutional Networks (GCN)
+to the domain of brain-related disorders classification in populations.
+We conducted experiments on the ABIDE dataset to reproduce and challenge the results of the paper.
+We paid attention to make it reproducible and our code is available on \href{https://github.com/balthazarneveu/spectral_graph_convolutions}{Github}
 
 \end{abstract}
 
