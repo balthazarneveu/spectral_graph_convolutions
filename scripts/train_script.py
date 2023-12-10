@@ -54,7 +54,8 @@ def train(device=DEVICE, n_epochs=1000):
     models_list = ["Dense", "Dense-dr=0.1", "Dense-dr=0.2", "Dense-dr=0.3"]
     models_list = ["Single", "Single-dr=0.1", "Single-dr=0.2", "Single-dr=0.3"]
     models_list = ["Single-h=1", "Single-h=4", "Single-h=8", "Single-h=16"]
-    models_list = ["Dense"]
+    models_list = ["Single-h=1"]
+    # models_list = ["Dense"]
     # models_list = ["GCN", "GCN-dr=0.3"]
     # models_list = ["Cheb-dr=0.3"]
     optimizer_params = {
@@ -63,14 +64,19 @@ def train(device=DEVICE, n_epochs=1000):
     }
     # noise_levels_list = [0.1, None]
     noise_levels_list = [None]
-    for feat_kind, model_name, noise_level in product([RFE_DIM_REDUCTION], models_list, noise_levels_list):
+    seeds_list = [42, 43, 81, 53, 19, 708, 901, 844, 98, 55]
+    for feat_kind, model_name, noise_level, seed in product(
+        [RFE_DIM_REDUCTION], models_list, noise_levels_list, seeds_list
+    ):
         exp_name = f"{model_name} {feat_kind}"
         if noise_level is not None:
             exp_name += f" noise={noise_level:.2f}"
+        exp_name += f" seed={seed}"
         training_data, adj = prepare_training_data(
             device=device,
             dimension_reduction=feat_kind,
-            keep_frozen_masks=False
+            keep_frozen_masks=False,
+            seed=seed
         )
         feat_dim = training_data[INPUTS].shape[1]
         if "-h=" in model_name:
