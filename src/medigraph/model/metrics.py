@@ -34,13 +34,17 @@ def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
     if plot_flag:
         plt.figure(figsize=(10, 6))
         sns.boxplot(data=all_test_acc, palette="Set2")  # Using Seaborn's palette for colors
-        plt.xticks(ticks=range(len(metric_dict)), labels=metric_dict.keys())  # Setting model names as labels
+        xlabels = [m.replace(" ", "\n") for m in metric_dict.keys()]
+        plt.xticks(ticks=range(len(metric_dict)), labels=xlabels)  # Setting model names as labels
         plt.ylabel("Best Test Accuracy")
         plt.title("Comparison of Model Performances")
         # Creating custom legend
-        patches = [plt.Line2D([0], [0], color=sns.color_palette("Set2")[i], marker='o', linestyle='', label=label)
+        colors = sns.color_palette("Set2")
+        patches = [plt.Line2D([0], [0], color=colors[i % len(colors)], marker='o', linestyle='',
+                              label=label)
                    for i, label in enumerate(mean_acc_labels)]
-        plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(0.95, 1), loc='upper left')
+        plt.ylim(0.4, 0.75)
         plt.show()
 
     return results
