@@ -14,6 +14,8 @@ def analyze_metrics(
     metric_dict: dict,
     plot_flag: bool = False,
     figsize: Tuple[int, int] = (10, 6),
+    ylim: Optional[Tuple[float, float]] = (0.4, 0.75),
+    grid=False,
     title: Optional[str] = "Comparison of Model Performances"
 ) -> dict:
     """Extract best metric for each run on the point with the lowest validation loss
@@ -54,8 +56,9 @@ def analyze_metrics(
             [0.695, 0.695],
             color="m", linestyle="--", alpha=0.3, label="GCN author's accuracy")
         plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(0.95, 1), loc='upper left')
-        
-        plt.ylim(0.4, 0.75)
+        if grid:
+            plt.grid()
+        plt.ylim(*ylim)
         plt.show()
 
     return results

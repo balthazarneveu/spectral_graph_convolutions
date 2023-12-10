@@ -5,6 +5,8 @@ from medigraph.data.properties import (RFE_DIM_REDUCTION, NORMALIZED_INPUTS)
 import logging
 from typing import List, Tuple, Optional
 from tqdm import tqdm
+from texttable import Texttable
+import latextable
 
 
 def retrieve_metrics(
@@ -37,3 +39,27 @@ def retrieve_metrics(
         else:
             logging.warning(f"Missing {exp_name}")
     return metric_dict
+
+
+def get_table(res: dict, caption="Impact of feature reduction", table_label="input_features_reduction"):
+    table = Texttable()
+    table.set_deco(Texttable.HEADER)
+    header = ["Model", "Feature", "Test accuracy"]
+    table_content = []
+    for model_key, model in res.items():
+        model_name = model_key.split(" ")[0]
+        feature_type = model_key.split(" ")[1].replace("_", " ")
+        table_content.append([
+            model_name,
+            feature_type,
+            f"{100.*model['mean_test_accuracy']:.1f} +/- {100*model['std_test_accuracy']:.1f}\%"
+        ])
+    table.add_rows([
+        header,
+        *table_content
+    ])
+    print(table.draw())
+    print(latextable.draw_latex(
+        table,
+        caption=caption,
+        label=f"table:{table_label.replace(' ', '_')}"))
