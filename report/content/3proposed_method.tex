@@ -9,7 +9,7 @@ Autism spectrum disorder (ASD) is now recognized to occur in more than 1\% of ch
 It is based on the principle that different regions of the brain exhibit correlated spontaneous fluctuations in blood oxygen level-dependent (BOLD) signals even in the absence of an explicit stimulus or task. These fluctuations are thought to reflect the intrinsic functional connectivity of the brain. 
 
 The authors \cite{Parisot17} proposed to construct a population graph integrating imaging and non-imaging data. 
-They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. The figure \ref{fig:connectivity_matrix} display the connectivity matrix obtained for one of the patient in the ABIDE dataset. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}.  
+They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. The figure \ref{fig:connectivity_matrix} display the connectivity matrix obtained for three patients in the ABIDE dataset. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}.  
 
 \begin{figure*}[h!]
     \begin{subfigure}{0.3\textwidth}
@@ -47,7 +47,7 @@ The connectome encapsulates the intricate web of connections between different b
     \label{fig:connectome}
 \end{figure}
 
-Given the matrix's high dimensionality (6700 \blue{review true number}), they employed a ridge classifier to pinpoint the most discriminative features within the training set.
+Given the matrix's high dimensionality (number of patients $\times 6217$), they employed a ridge classifier to pinpoint the most discriminative features within the training set.
 
 They modeled the interactions between individuals via the definition of the graph edges $\EE$ which writes as follows for two nodes $v$ and $v'$ :
 $$ 
@@ -56,9 +56,9 @@ $$
 
 $\delta$ is the Kronecker delta function.  $M_{SITE}$ and $M_{SEX}$ are contextual information. $Sim$ is a similarity measures between the connectivity matrices of the subjects $v$ and $v'$. In \cite{Parisot17}, the authors used the correlation distance 
 $$
-Sim(X_v, X_{v'}) =  1 - \frac{(X_v - \bar{X}_v).(X_{v'} - \bar{X}_{v'})}{\norm{X_v -\bar{X}_{v}}_2\norm{X_{v'} - \bar{X}_{v'}}_2}
+Sim(X_v, X_{v'}) =  1 - \frac{(X_v - \widebar{X}_v).(X_{v'} - \widebar{X}_{v'})}{\norm{X_v -\widebar{X}_{v}}_2\norm{X_{v'} - \widebar{X}_{v'}}_2}
 $$
-where $\bar{X}_v$ is the mean of the elements of the vectorized connectivity matrix of patient $v$. 
+where $\widebar{X}_v$ is the mean of the elements of the vectorized connectivity matrix of patient $v$. 
 
 On the figure \ref{fig:sorted_adjacency}, certain sets or squares stand out with significantly higher correlation along the diagonal exhibiting the proximity between those metadata information. 
 
