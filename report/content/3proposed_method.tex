@@ -9,7 +9,26 @@ Autism spectrum disorder (ASD) is now recognized to occur in more than 1\% of ch
 It is based on the principle that different regions of the brain exhibit correlated spontaneous fluctuations in blood oxygen level-dependent (BOLD) signals even in the absence of an explicit stimulus or task. These fluctuations are thought to reflect the intrinsic functional connectivity of the brain. 
 
 The authors \cite{Parisot17} proposed to construct a population graph integrating imaging and non-imaging data. 
-They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}. Given the matrix's high dimensionality (6700 \blue{review true number}), they employed a ridge classifier to pinpoint the most discriminative features within the training set. 
+They defined the feature vector $x(v)$ of each patient $v$ as the vectorized form $X_{v}$ of its functional connectivity matrix. Connectivity matrices represent the strength of functional connections between different brain regions for a given subject. They are derived from rs-fMRI data by computing the Pearson's correlation coefficient between brain regions' activity patterns, offering a concise representation of interregional communication within brain regions. The figure \ref{fig:connectivity_matrix} display the connectivity matrix obtained for one of the patient in the ABIDE dataset. \blue{Note that they also applied the Fisher transform of the Pearson correlation but we did not do it}.  
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/ex_connectivity_matrix.png}
+    \caption{Connectivity matrix of a given subject.} ach brain region are indicated in the x and y axis. The color of the pixel indicates the strength of the functional connection between the two regions. We did not plot all 111 regions for the sake of readability.
+    \Description{}
+    \label{fig:connectivity_matrix}
+\end{figure}
+The connectome, often described as the \textit{wiring diagram} of the brain, encapsulates the intricate web of connections between different brain regions. In figure \ref{fig:connectome}, we depict the brain graph associated with the connectivity matrix computed in figure \ref{fig:connectivity_matrix}. The coordinate of brain regions are derived from the Harvard-Oxford atlas\footnote{http://preprocessed-connectomes-project.org/abide/Pipelines.html} which defines a mask comprising 111 regions of interest (ROIs).
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/ex_brain_connectivity.png}
+    \caption{Connectome graph of a given patient}  Each node represents a specific brain region and edges correspond to the connectivity between two regions as plotted in figure \ref*{fig:connectivity_matrix}. This representation offers a unique insight into the patient's neural architecture, shedding light on the potential correlates of cognitive processes, as well as providing valuable information for understanding the impact of neurological conditions. Note that the exact values of the edges weights were multiplied by 50 to improve the readability of the figure.
+    \Description{}
+    \label{fig:connectome}
+\end{figure}
+
+Given the matrix's high dimensionality (6700 \blue{review true number}), they employed a ridge classifier to pinpoint the most discriminative features within the training set.
 
 They modeled the interactions between individuals via the definition of the graph edges $\EE$ which writes as follows for two nodes $v$ and $v'$ :
 $$ 
@@ -27,7 +46,7 @@ On the figure \ref{fig:sorted_adjacency}, certain sets or squares stand out with
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.45\textwidth]{figures/sorted_adjacency_by_site_id_by_sex.png}
-    \caption{Edge weights sorted by acquisation sites and sex.}
+    \caption{Edge weights sorted by \textit{acquisation sites} and \textit{gender}.} This plot elucidates the process of using contextual and phenotypic information to construct connections in the graph. The fundamental concept underlying this graph structure is to harness site information, anticipating greater comparability among subjects within the same site owing to diverse acquisition protocols.
     \Description{}
     \label{fig:sorted_adjacency}
 \end{figure}
