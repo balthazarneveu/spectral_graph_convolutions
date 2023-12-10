@@ -18,7 +18,7 @@ We implemented three distinct models:
 \end{enumerate}
 
 
-\subsection{Dimensionality reduction by Recursive Feature Selection with a Ridge classifier}
+\subsection{Dimensionality reduction by Recursive Feature Elimination with a Ridge classifier}
 
 A Ridge classifier is a standard linear classifier with an added regularization term known as the Ridge (L2) penalty.
 
@@ -49,8 +49,8 @@ The recursive feature elimination (RFE) is employed to iteratively select featur
 We tested these autoencoders against Recursive Feature Elimination (RFE) and using all input features. We implemented simple autoencoders, the encoder and the decoder contain one linear layer each, and the bottleneck has the same dimension as the number of features to select used in the RFE, finally, we chose a tanh function as an activation function between these layers.
 
 \begin{figure}[h!]
-    \includegraphics[width=0.5\textwidth]{figures/autoencoder_results.png}
-    \caption{Comparison of dimensionality reduction methods}
+    \includegraphics[width=0.5\textwidth]{figures/autoencoders_results.png}
+    \caption{Comparison of dimensionality reduction methods - including using autoencoders.}
     \label{fig:autoencoders}
     \Description{}
 \end{figure}
