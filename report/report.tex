@@ -67,6 +67,20 @@
 
 \end{abstract}
 
+\begin{teaserfigure}
+  \includegraphics[width=\textwidth]{figures/spectral_graph_convolution_graph_overview.png}
+  \caption{Overview of the use of graph convolutional networks to predict ASD (autism spectrum disorder).
+  The ABIDE dataset was created to study autism and contains a set of functional MRI from 871 patients 
+  of different genders and captured over 17 different sites with different f-MRI devices. Input data is scarce and not totally homogeneous.
+  On the left, the creation of the content of a single node is shown. 111 temporal series are extracted from the f-MRI 
+  and correlation allows to create a connectivity 111x111 symmetric matrix of the brain of each patient.
+  A population graph is created by connecting each patient (node) to the other patients with an edge weighted by the similarity between the patients.
+  It is proessed by a graph convolutional network to predict the ASD status of each patient.
+  Nodes are partially labeled to split the dataset between training, validation and test set.
+  }
+  \Description{}
+  \label{fig:overview}
+\end{teaserfigure}
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
