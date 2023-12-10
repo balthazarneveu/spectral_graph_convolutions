@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+
 TRAIN = "train"
 VALIDATION = "validation"
 TEST = "test"
@@ -7,11 +9,41 @@ LOSS = "loss"
 ACCURACY = "accuracy"
 
 
-def analyze_metrics(metric_dict: dict):
+def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
     """Extract best metric for each run on the point with the lowest validation loss
-    Just like one would do when reporting results in a paper
+    and optionally create a "Moustache plot" aka Tukey box plot
+    of the best test accuracies.
     """
-    pass
+    results = {}
+    all_test_acc = []
+    mean_acc_labels = []
+    for model_name, metric in metric_dict.items():
+        best_test_acc_list = []
+
+        for seed, current_metric in metric.items():
+            best_val_loss_idx = np.argmin(current_metric[LOSS][VALIDATION])
+            best_test_acc = current_metric[ACCURACY][TEST][best_val_loss_idx]
+            best_test_acc_list.append(best_test_acc)
+
+        mean_test_acc = np.mean(best_test_acc_list)
+        std_test_acc = np.std(best_test_acc_list)
+        results[model_name] = {"mean_test_accuracy": mean_test_acc, "std_test_accuracy": std_test_acc}
+        mean_acc_labels.append(f"{model_name} ({mean_test_acc:.1%})")
+        all_test_acc.append(best_test_acc_list)
+
+    if plot_flag:
+        plt.figure(figsize=(10, 6))
+        sns.boxplot(data=all_test_acc, palette="Set2")  # Using Seaborn's palette for colors
+        plt.xticks(ticks=range(len(metric_dict)), labels=metric_dict.keys())  # Setting model names as labels
+        plt.ylabel("Best Test Accuracy")
+        plt.title("Comparison of Model Performances")
+        # Creating custom legend
+        patches = [plt.Line2D([0], [0], color=sns.color_palette("Set2")[i], marker='o', linestyle='', label=label)
+                   for i, label in enumerate(mean_acc_labels)]
+        plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.show()
+
+    return results
 
 
 def plot_metrics(metric_dict: dict) -> None:
