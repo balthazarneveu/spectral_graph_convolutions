@@ -2,10 +2,23 @@
 \section{Results and Discussion}
 
 
-\subsection{Result of DenseNN on original features}
+\subsection{Experimental setting}
 
-\subsection{Result on reduced features}
+In line with the methodology outlined in the original paper, we systematically selected a subset of $2000$ features with the RFE algorithm. 
+
+
+\blue{Bal}
+
+\subsection{Comparison of methods}
+
+The boxplot \ref{???} displays the performance of the various configurations in our study. Despite the diverse setups tested, it is noteworthy that these configurations did not yield significantly different performances on the test data. Furthermore, the reduction of features through Recursive Feature Elimination (RFE) did not demonstrate any discernible improvement in performance.
+
 
 \subsection{Main limitations}
 
-(example where the method does not work) 
+
+One prominent challenge that emerged from our experiments was the significant mismatch between the number of subjects ($871$) and the number of features (higher than $6100$), even after dimension reduction techniques were applied. This scenario places us squarely in the realm of the "curse of dimensionality," introducing complexities that can adversely impact the training of neural network models. With a limited number of subjects, the data points within the high-dimensional feature space become sparsely distributed. This sparsity poses challenges for neural networks, as they may struggle to capture meaningful patterns and relationships in the data, leading to overfitting or suboptimal generalization.
+
+In particular, all the models were overfitting the training data, as evidenced by the large gap between the training and validation accuracies. We attempted to mitigate this issue by applying dropout and $L_2$ regularization. \blue{We note that the ChebGCN with a dropout rate of $0.1$ yields the best performance on the validation data}
+
+In conclusion, our experiments encompassed a range of configurations, each designed to explore different facets of the model. Despite the diversity in hyperparameters and settings, the performance across these configurations on the test data exhibited minimal variations.
