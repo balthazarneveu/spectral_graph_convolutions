@@ -1,8 +1,36 @@
 
 \section{Results and Discussion}
 
+We train
 
 \subsection{Result of DenseNN on original features}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/model_performances_architecture.png}
+    \caption{Classification accuracy}
+    \Description{}
+    \label{fig:results_architecture}
+\end{figure*}
+
+\begin{table}[H]
+	\begin{center}
+		\begin{tabular}{lll}
+			Model & Feature & Test accuracy \\
+			\hline
+			Single-h=4 & rfe & 61.8 +/- 4.4\% \\
+			Single-h=16 & rfe & 63.0 +/- 5.1\% \\
+			Single-h=128 & rfe & 63.9 +/- 4.6\% \\
+			Cheb-dr=0.3 & rfe & 63.0 +/- 5.4\% \\
+			Cheb-dr=0.1 & rfe & 68.2 +/- 4.0\% \\
+			Cheb-dr=0.0 & rfe & 68.9 +/- 4.0\% \\
+			Dense & rfe & 63.4 +/- 3.3\% \\
+		\end{tabular}
+	\end{center}
+	\caption{Models performances with regard to architecture}
+	\label{table:dependance_on_architecture}
+\end{table}
+
 
 \subsection{Result on reduced features}
 
