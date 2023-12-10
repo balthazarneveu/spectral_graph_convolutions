@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from typing import Optional, Tuple
 
 TRAIN = "train"
 VALIDATION = "validation"
@@ -9,7 +10,12 @@ LOSS = "loss"
 ACCURACY = "accuracy"
 
 
-def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
+def analyze_metrics(
+    metric_dict: dict,
+    plot_flag: bool = False,
+    figsize: Tuple[int, int] = (10, 6),
+    title: Optional[str] = "Comparison of Model Performances"
+) -> dict:
     """Extract best metric for each run on the point with the lowest validation loss
     and optionally create a "Moustache plot" aka Tukey box plot
     of the best test accuracies.
@@ -32,12 +38,12 @@ def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
         all_test_acc.append(best_test_acc_list)
 
     if plot_flag:
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=figsize)
         sns.boxplot(data=all_test_acc, palette="Set2")  # Using Seaborn's palette for colors
         xlabels = [m.replace(" ", "\n") for m in metric_dict.keys()]
         plt.xticks(ticks=range(len(metric_dict)), labels=xlabels)  # Setting model names as labels
         plt.ylabel("Best Test Accuracy")
-        plt.title("Comparison of Model Performances")
+        plt.title(title)
         # Creating custom legend
         colors = sns.color_palette("Set2")
         patches = [plt.Line2D([0], [0], color=colors[i % len(colors)], marker='o', linestyle='',
@@ -50,7 +56,7 @@ def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
     return results
 
 
-def plot_metrics(metric_dict: dict) -> None:
+def plot_metrics(metric_dict: dict, figsize=(10, 6)) -> None:
     """Compare training metrics of different models
 
     Args:
@@ -97,7 +103,7 @@ def plot_metrics(metric_dict: dict) -> None:
         }
         ```
     """
-    fig, axs = plt.subplots(1, 3, figsize=(10, 6))
+    fig, axs = plt.subplots(1, 3, figsize=figsize)
     colors = ["b", "g", "r", "y", "m", "c", "k"]
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
