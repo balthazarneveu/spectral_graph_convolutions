@@ -7,6 +7,13 @@ LOSS = "loss"
 ACCURACY = "accuracy"
 
 
+def analyze_metrics(metric_dict: dict):
+    """Extract best metric for each run on the point with the lowest validation loss
+    Just like one would do when reporting results in a paper
+    """
+    pass
+
+
 def plot_metrics(metric_dict: dict) -> None:
     """Compare training metrics of different models
 
@@ -15,23 +22,41 @@ def plot_metrics(metric_dict: dict) -> None:
         ```
         {
             "model1": {
-                "loss": {
-                    "train": [float],
-                    "validation: [float]
+                "seed1: {
+                    "loss": {
+                        "train": [float],
+                        "validation": [float],
+                        "test": [float]
+                    },
+                    "accuracy": {
+                        "train": [float],
+                        "validation": [float],
+                        "test": [float]
+                    }
                 },
-                "accuracy": {
-                    "train": [float],
-                    "validation: [float]
-                }
+                "seed2: {
+                    "loss": {
+                        "train": [float],
+                        "validation": [float],
+                        "test": [float]
+                    },
+                    "accuracy": {
+                        "train": [float],
+                        "validation": [float],
+                        "test": [float]
+                    }
+                },
             "model2": {
-                "loss": {
-                    "train": [float],
-                    "validation: [float]
+                "seed1: {
+                    "loss": {
+                        "train": [float]
+                        "validation: [float]
+                    },
+                    "accuracy": {
+                        "train": [float],
+                        "validation: [float]
+                    }
                 },
-                "accuracy": {
-                    "train": [float],
-                    "validation: [float]
-                }
             }
         }
         ```
