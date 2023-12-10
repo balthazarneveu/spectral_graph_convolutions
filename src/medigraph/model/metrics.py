@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-from typing import Optional, Tuple
 
 TRAIN = "train"
 VALIDATION = "validation"
@@ -10,14 +9,7 @@ LOSS = "loss"
 ACCURACY = "accuracy"
 
 
-def analyze_metrics(
-    metric_dict: dict,
-    plot_flag: bool = False,
-    figsize: Tuple[int, int] = (10, 6),
-    ylim: Optional[Tuple[float, float]] = (0.4, 0.75),
-    grid=False,
-    title: Optional[str] = "Comparison of Model Performances"
-) -> dict:
+def analyze_metrics(metric_dict: dict, plot_flag: bool = False) -> dict:
     """Extract best metric for each run on the point with the lowest validation loss
     and optionally create a "Moustache plot" aka Tukey box plot
     of the best test accuracies.
@@ -40,31 +32,25 @@ def analyze_metrics(
         all_test_acc.append(best_test_acc_list)
 
     if plot_flag:
-        plt.figure(figsize=figsize)
+        plt.figure(figsize=(10, 6))
         sns.boxplot(data=all_test_acc, palette="Set2")  # Using Seaborn's palette for colors
         xlabels = [m.replace(" ", "\n") for m in metric_dict.keys()]
         plt.xticks(ticks=range(len(metric_dict)), labels=xlabels)  # Setting model names as labels
         plt.ylabel("Best Test Accuracy")
-        plt.title(title)
+        plt.title("Comparison of Model Performances")
         # Creating custom legend
         colors = sns.color_palette("Set2")
         patches = [plt.Line2D([0], [0], color=colors[i % len(colors)], marker='o', linestyle='',
                               label=label)
                    for i, label in enumerate(mean_acc_labels)]
-        plt.plot(
-            [-0.5, len(metric_dict.keys())-1+0.5],
-            [0.695, 0.695],
-            color="m", linestyle="--", alpha=0.3, label="GCN author's accuracy")
         plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(0.95, 1), loc='upper left')
-        if grid:
-            plt.grid()
-        plt.ylim(*ylim)
+        plt.ylim(0.4, 0.75)
         plt.show()
 
     return results
 
 
-def plot_metrics(metric_dict: dict, figsize=(10, 6)) -> None:
+def plot_metrics(metric_dict: dict) -> None:
     """Compare training metrics of different models
 
     Args:
@@ -111,7 +97,7 @@ def plot_metrics(metric_dict: dict, figsize=(10, 6)) -> None:
         }
         ```
     """
-    fig, axs = plt.subplots(1, 3, figsize=figsize)
+    fig, axs = plt.subplots(1, 3, figsize=(10, 6))
     colors = ["b", "g", "r", "y", "m", "c", "k"]
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
