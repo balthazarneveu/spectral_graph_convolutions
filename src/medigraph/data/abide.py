@@ -10,8 +10,9 @@ import numpy as np
 from scipy.spatial import distance
 from sklearn.linear_model import RidgeClassifier
 from sklearn.feature_selection import RFE
-from medigraph.data.properties import ADJ, RAW_INP, LABELS, NORMALIZED_INPUTS, ALL_INPUTS, RFE_DIM_REDUCTION, TEST_MASK, TRAIN_MASK, VAL_MASK, INPUTS
+from medigraph.data.properties import ADJ, RAW_INP, LABELS, NORMALIZED_INPUTS, ALL_INPUTS, RFE_DIM_REDUCTION, AE_DIM_REDUCTION, TEST_MASK, TRAIN_MASK, VAL_MASK, INPUTS
 from medigraph.data.io import Dump
+from medigraph.data.autoencoders import AutoEncoder, training_loop
 
 DEFAULT_ABIDE_NAME = "__ABIDE_dataset"
 root_folder = Path(__file__).parent.parent.parent.parent.absolute()
@@ -89,6 +90,21 @@ class AbideData():
         selected_features = selector.transform(full_features)
 
         return selected_features
+    
+    def get_selected_AE_features(self, mask_classifier: np.ndarray, n_features_to_select: int = 200):
+
+        full_features = self.get_input_feature_map()
+        X = full_features[mask_classifier]
+        input_features = X.shape[1]
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        AE = AutoEncoder(input_features, n_features_to_select)
+        AE.to(device)
+
+        AE, _ = training_loop(AE, X, device)
+        selected_features = AE(full_features)
+
+        return selected_features
+
 
     def get_labels(self) -> np.ndarray:
         """Retrieve labels for each patient (DX_GROUP)
@@ -210,6 +226,11 @@ class AbideData():
             n_features_to_select=nb_features_reduced
         )
         data_dict[ALL_INPUTS][RFE_DIM_REDUCTION] = selected_feat
+        selected_feat_AE = self.get_selected_AE_features(
+            mask_classifier,
+            n_features_to_select=nb_features_reduced
+        )
+        data_dict[ALL_INPUTS][AE_DIM_REDUCTION] = selected_feat_AE
 
         # ADJACENCY MATRIX (build the actual graph)
         data_dict[ADJ] = self.get_graph_adjacency()  # [V, V]
