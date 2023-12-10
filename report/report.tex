@@ -1,24 +1,24 @@
-\documentclass[sigconf]{acmart}
-
+\documentclass[sigconf,authorversion,nonacm]{acmart}
 \input{shortcuts.sty}
 \usepackage{subcaption}
 \settopmatter{printfolios=true}
+\settopmatter{printacmref=false}
 %%
 %% \BibTeX command to typeset BibTeX logo in the docs
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     Bib\TeX}}}
 
-
+\setcopyright{None}
+\settopmatter{printacmref=false}
 
 % \setcopyright{acmcopyright}
-\copyrightyear{2023}
-\acmYear{2023}
+% \copyrightyear{2023}
+% \acmYear{2023}
 % \acmDOI{XXXXXXX.XXXXXXX}
 
 %% These commands are for a PROCEEDINGS abstract or paper.
-\acmConference[MVA 2023]{MVA 2023}{December
-  2023}{Paris, FR}
+\acmConference[MVA 2023]{MVA 2023}{December 2023}{Paris, FR}
 
 % \acmPrice{15.00}
 % \acmISBN{978-1-4503-XXXX-X/18/06}
