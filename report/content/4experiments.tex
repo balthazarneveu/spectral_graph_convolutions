@@ -34,13 +34,27 @@ where $sign$ is a function that return $1$ if the input is positive, $-1$ if the
 % The Ridge penalty term, $\alpha \lVert w \rVert_2^2$, penalizes large values of the weights, encouraging a more generalizable model and helping to mitigate overfitting.
 
 The recursive feature elimination (RFE) is employed to iteratively select features by progressively considering smaller sets of features. Initially, the estimator is trained on the complete set of features, and the importance of each feature $i$ is determined by evaluating the weights assigned to the Ridge estimator $\hat{\beta}_i$. Subsequently, the least important features are pruned from the current set and this process is repeated recursively on the pruned set until the desired number of features to select is reached.
-\begin{figure*}[t!]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/rfe.png}
-    \caption{Relative importance of features for recursive elimination}
-    \label{fig:rfe}
-    \Description{}
-\end{figure*}
+% \begin{figure*}[t!]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/rfe.png}
+%     \caption{Relative importance of features for recursive elimination}
+%     \label{fig:rfe}
+%     \Description{}
+% \end{figure*}
 
 \subsection{Dimensionality reduction by Autoencoder}
+
+\quad Autoencoders are a type of neural network architecture widely employed for dimensionality reduction in machine learning applications. When applied to feature selection, autoencoders aim to learn a compressed representation of the input data, effectively and automatically capturing its essential features.
+
+We tested these autoencoders against Recursive Feature Elimination (RFE) and using all input features. We implemented simple autoencoders, the encoder and the decoder contain one linear layer each, and the bottleneck has the same dimension as the number of features to select used in the RFE, finally, we chose a tanh function as an activation function between these layers.
+
+\begin{figure}[h!]
+    \includegraphics[width=0.5\textwidth]{figures/autoencoder_results.png}
+    \caption{Comparison of dimensionality reduction methods}
+    \label{fig:autoencoders}
+    \Description{}
+\end{figure}
+ 
+The results obtained are reported in the figure \ref{fig:autoencoders}. While autoencoders provide close accuracies, they fall slightly short of the performance achieved by the other methods. This outcome suggests that, in the context of disease prediction classifier, RFE and utilizing the complete set of input features may yield slightly better results. Understanding the trade-offs between these techniques is crucial in selecting an appropriate dimensionality reduction strategy that aligns with the specific characteristics and requirements of your dataset and prediction task.
+
 
