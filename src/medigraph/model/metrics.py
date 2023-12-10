@@ -41,12 +41,20 @@ def plot_metrics(metric_dict: dict) -> None:
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
         color = colors[idx % len(colors)]
-        axs[0].plot(metric[LOSS][TRAIN], color+"--", label=model_name + " TRAIN")
-        axs[0].plot(metric[LOSS][VALIDATION], color+"-.", alpha=0.8, label=model_name + " VALIDATION")
-        axs[0].plot(metric[LOSS][TEST], color+"-", linewidth=2, label=model_name + " TEST")
-        axs[1].plot(metric[ACCURACY][TRAIN], color+"--", label=f"{model_name} TRAIN accuracy")
-        axs[1].plot(metric[ACCURACY][VALIDATION], color+"-.", alpha=0.8, label=f"{model_name} VALIDATION accuracy")
-        axs[2].plot(metric[ACCURACY][TEST], color+"-", linewidth=2, label=f"{model_name} TEST accuracy")
+        for seed_idx, seed in enumerate(metric.keys()):
+            current_metric = metric[seed]
+            print(seed)
+            axs[0].plot(current_metric[LOSS][TRAIN], color+"--", label=None if seed_idx >= 1 else model_name + " TRAIN")
+            axs[0].plot(current_metric[LOSS][VALIDATION], color+"-.", alpha=0.8,
+                        label=None if seed_idx >= 1 else model_name + " VALIDATION")
+            axs[0].plot(current_metric[LOSS][TEST], color+"-", linewidth=2,
+                        label=None if seed_idx >= 1 else model_name + " TEST")
+            axs[1].plot(current_metric[ACCURACY][TRAIN], color+"--",
+                        label=None if seed_idx >= 1 else f"{model_name} TRAIN accuracy")
+            axs[1].plot(current_metric[ACCURACY][VALIDATION], color+"-.", alpha=0.8,
+                        label=None if seed_idx >= 1 else f"{model_name} VALIDATION accuracy")
+            axs[2].plot(current_metric[ACCURACY][TEST], color+"-", linewidth=2,
+                        label=None if seed_idx >= 1 else f"{model_name} TEST accuracy")
     for ax in axs:
         ax.legend()
         ax.grid()
