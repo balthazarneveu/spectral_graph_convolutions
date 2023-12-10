@@ -49,7 +49,12 @@ def analyze_metrics(
         patches = [plt.Line2D([0], [0], color=colors[i % len(colors)], marker='o', linestyle='',
                               label=label)
                    for i, label in enumerate(mean_acc_labels)]
+        plt.plot(
+            [-0.5, len(metric_dict.keys())-1+0.5],
+            [0.695, 0.695],
+            color="m", linestyle="--", alpha=0.3, label="GCN author's accuracy")
         plt.legend(handles=patches, title="Mean Accuracy", bbox_to_anchor=(0.95, 1), loc='upper left')
+        
         plt.ylim(0.4, 0.75)
         plt.show()
 
