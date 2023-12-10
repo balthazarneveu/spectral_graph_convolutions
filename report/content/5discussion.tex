@@ -12,6 +12,15 @@ In order to compare several methods (architecture, feature selection), we train 
 	We pick the epoch which corresponds to the minimum validation loss and take the corresponding test accuracy at this specific epoch. Mean and standard deviation of the accuracy across all splits.
 \end{itemize}
 
+We abbreviate the tested configurations as follows:
+\begin{itemize}
+	\item Single-h=$h$ refers to a single hidden layer with around 6000 features or 2000 when reduced, $h$ hidden neurons and a single output for binary classification.
+	\item Dense refers to a fully connected neural network with 2 hidden layers and a final linear classifier.
+	\item Cheb-dr=$dr$ refers to the Chebyshev spectral graph convolutional \cite{Defferrard2016} architecture with a dropout rate of $dr$.
+\end{itemize}
+
+We systematically used the Adam optimizer with a learning rate of $10^{-4}$ and a weight decay of $0.1$ and train for 1000 epochs.
+The majority of models overfit the training dataset.
 
 \subsection{Results on using reduced features}
 
