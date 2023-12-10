@@ -41,14 +41,20 @@ def plot_metrics(metric_dict: dict) -> None:
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
         color = colors[idx % len(colors)]
-        axs[0].plot(metric[LOSS][TRAIN], color+"--", label=model_name)
-        axs[0].plot(metric[LOSS][VALIDATION], color+"-", label=model_name)
+        axs[0].plot(metric[LOSS][TRAIN], color+"--", label=model_name + " TRAIN")
+        axs[0].plot(metric[LOSS][VALIDATION], color+"-.", alpha=0.8, label=model_name + " VALIDATION")
+        axs[0].plot(metric[LOSS][TEST], color+"-", linewidth=2, label=model_name + " TEST")
         axs[1].plot(metric[ACCURACY][TRAIN], color+"--", label=f"{model_name} TRAIN accuracy")
-        axs[1].plot(metric[ACCURACY][VALIDATION], color+"-", label=f"{model_name} VALIDATION accuracy")
+        axs[1].plot(metric[ACCURACY][VALIDATION], color+"-.", alpha=0.8, label=f"{model_name} VALIDATION accuracy")
+        axs[1].plot(metric[ACCURACY][TEST], color+"-", linewidth=2, label=f"{model_name} TEST accuracy")
     for ax in axs:
         ax.legend()
         ax.grid()
-    axs[0].set_title("Training loss (Binary Cross Entropy)")
+    axs[0].set_xlabel("Epochs")
+    axs[0].set_ylabel("Binary Cross Entropy Loss")
+    axs[1].set_xlabel("Epochs")
+    axs[1].set_ylabel("Accuracy")
+    axs[0].set_title("Losses")
     axs[1].set_title("Accuracy")
 
     plt.show()
