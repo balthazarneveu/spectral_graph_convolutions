@@ -1,5 +1,5 @@
-# Sprectral graph convolutions
-Student project on [Spectral Graph Convolutions for Population-based Disease Prediction](https://arxiv.org/abs/1703.03020)
+# Spectral graph convolutions
+Student review on [Spectral Graph Convolutions for Population-based Disease Prediction](https://arxiv.org/abs/1703.03020)
 
 
 # :scroll: [Report](/report/87_Ines_VATI_Manal_AKHANNOUSS_Balthazar_NEVEU.pdf)
@@ -14,7 +14,7 @@ Student project on [Spectral Graph Convolutions for Population-based Disease Pre
 
 ![Method overview](report/figures/spectral_graph_convolution_graph_overview.png)
 
-*Overview of the use of graph convolutional networks to predict ASD (autism spectrum disorder).
+> Overview of the use of graph convolutional networks to predict ASD (autism spectrum disorder).
 The ABIDE dataset was created to study autism and contains a set of functional MRI from 871 patients 
 of different genders and captured over 17 different sites with different f-MRI devices. Input data is scarce and not totally homogeneous.
 On the left, the creation of the content of a single node is shown. 111 temporal series are extracted from the f-MRI and correlation allows creating a connectivity 111×111 symmetric matrix of the brain of each patient.
@@ -61,6 +61,9 @@ Cross validation is performed on 10 runs using 10 fixed seeds to split the datas
 |:-----: |:-----:|
 | ![time_series](/ABIDE_dataset/figures/separate_time_series.png) | ![connectivity_matrix](/ABIDE_dataset/figures/connectivity_matrix.png) |
 | Time series look impossible to compare accross patients| For each patient, connectivity matrix looks much more structured and informative|
+
+Brain connectivity (Using the HO Altas)
+![connectivity_brain](report/figures/ex_connectivity_pitt_ASD.png)
 
 
 
