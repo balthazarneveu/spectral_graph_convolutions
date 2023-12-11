@@ -21,6 +21,7 @@ We abbreviate the tested configurations as follows:
 
 We systematically used the Adam optimizer with a learning rate of $10^{-4}$ and a weight decay of $0.1$ and train for 1000 epochs.
 The majority of models overfit the training dataset.
+In all following boxplots, we report the original paper's accuracy (69.5\%) with a dashed purple line.
 
 \subsection{Results on using reduced features}
 
@@ -53,7 +54,8 @@ In line with the methodology outlined in the original paper, we systematically s
             Dense & ae & 60.7 +/- 4.0\% \\
         \end{tabular}
     \end{center}
-    \caption{Models performances with regard to feature extraction method}
+    \caption{Models performances with regard to feature reduction method.
+	There is no obvious advantage to using a feature reduction method.}
     \label{table:dependance_on_feature_extraction_method}
 \end{table}
 
@@ -62,7 +64,8 @@ Table \ref{table:dependance_on_feature_extraction_method} summarizes the results
 
 \subsection{Effect of using graph convolution}
 
-The boxplot \ref{fig:results_architecture} displays the performance of the various configurations in our study. We observe that the use of graph convolutional layers improves the performance of the model as claime by the authors of the original paper.
+The boxplot \ref{fig:results_architecture} displays the performance of the various configurations in our study. We observe that the use of graph convolutional layers improves the performance of the model as claimed by the authors of the original paper. All average performances
+are reported in \ref{table:dependance_on_architecture}.
 
 \begin{figure}[h!]
     \centering
@@ -97,11 +100,13 @@ The boxplot \ref{fig:results_architecture} displays the performance of the vario
 
 
 
-\subsection{Main limitations}
+\section{Main limitations and conclusion}
 
 
-One prominent challenge that emerged from our experiments was the significant mismatch between the number of subjects ($871$) and the number of features (higher than $6100$), even after dimension reduction techniques were applied. This scenario places us squarely in the realm of the "curse of dimensionality," introducing complexities that can adversely impact the training of neural network models. With a limited number of subjects, the data points within the high-dimensional feature space become sparsely distributed. This sparsity poses challenges for neural networks, as they may struggle to capture meaningful patterns and relationships in the data, leading to overfitting or suboptimal generalization.
+One prominent challenge that emerged from our experiments was the significant discrepancy between the number of subjects ($871$) and the number of features (higher than $6100$), even after dimension reduction techniques were applied. This scenario places us squarely in the realm of the "curse of dimensionality," introducing complexities that can adversely impact the training of neural network models. With a limited number of subjects, the data points within the high-dimensional feature space become sparsely distributed. This sparsity poses challenges for neural networks, as they may struggle to capture meaningful patterns and relationships in the data, leading to overfitting or suboptimal generalization.
 
-In particular, all the models were overfitting the training data, as evidenced by the large gap between the training and validation accuracies. We attempted to mitigate this issue by applying dropout and $L_2$ regularization. We note that the ChebGCN with a dropout rate of $0.1$ yields the best performance on the validation data.
+In particular, all the models were overfitting the training data, as evidenced by the large gap between the training (100\% accuracy) and validation accuracies (65\%). Despite our attempts to mitigate this issue (by applying dropout and $L_2$ regularization), neural network models always end up overfitting the training dataset. No matter how high the training accuracy gets, validation accuracy keeps increasing and we observe no degradation in the performances. This could be an instance of benign overfitting \cite{Bartlett_2020}. We note that the ChebGCN trained without dropout yields the best performance on the validation data 68.9 +/- 4.0\%, still not reaching the 69.5\% accuracy
+mentioned in the original paper.
 
-In conclusion, our experiments encompassed a range of configurations, each designed to explore different facets of the model. Despite the diversity in hyperparameters and settings, the performance across these configurations on the test data exhibited minimal variations.
+
+In conclusion, our experiments encompassed a range of configurations, each designed to explore different aspects of the model. Despite the diversity in hyperparameters and settings, the performance across these configurations on the test data exhibited minimal variations.
