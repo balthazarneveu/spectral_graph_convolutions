@@ -1,6 +1,8 @@
 # Spectral graph convolutions
 Student review on [Spectral Graph Convolutions for Population-based Disease Prediction](https://arxiv.org/abs/1703.03020)
 
+We only deal with the ABIDE dataset dedicated to the study of ASD (*autism spectrum disorder*).
+
 
 # :scroll: [Report](/report/87_Ines_VATI_Manal_AKHANNOUSS_Balthazar_NEVEU.pdf)
 
@@ -14,12 +16,12 @@ Student review on [Spectral Graph Convolutions for Population-based Disease Pred
 
 ![Method overview](report/figures/spectral_graph_convolution_graph_overview.png)
 
-> Overview of the use of graph convolutional networks to predict ASD (autism spectrum disorder).
+> Overview of the use of **graph convolutional networks** to predict ASD (autism spectrum disorder).
 The ABIDE dataset was created to study autism and contains a set of functional MRI from 871 patients 
 of different genders and captured over 17 different sites with different f-MRI devices. Input data is scarce and not totally homogeneous.
 On the left, the creation of the content of a single node is shown. 111 temporal series are extracted from the f-MRI and correlation allows creating a connectivity 111×111 symmetric matrix of the brain of each patient.
 A population graph is created by connecting each patient (node) to the other patients, with an edge weighted by the similarity between the patients.
-It is processed by a graph convolutional network to predict the ASD status of each patient.
+It is processed by a graph convolutional network to predict the ASD status of each patient (a probability of being healthy or affected by ASD).
 Nodes are partially labelled to split the dataset between training (80%), validation (10%) and test set (10%).
 
 -----------
