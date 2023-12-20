@@ -72,6 +72,10 @@ Brain connectivity (Using the HO Altas)
 #### How is the graph built?
 ![](report/figures/spectral_graph_convolution_graph_construction.png)
 
+:bulb: Notebook to get [intuition](studies/graph_convolution_intuition.ipynb)  on what the "graph convolution" aspect is doing:
+Since edges have been built using feature similarity, convolving the graph is equivalent to denoise features the way
+Non Local means would do on an image grid
+
 ------
 #### :gift: Extra content
 
