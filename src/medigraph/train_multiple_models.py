@@ -1,7 +1,7 @@
 from medigraph.train import training_loop
 
 from medigraph.data.abide import AbideData
-from medigraph.model.gcn import GCN, ChebGCN
+from medigraph.model.gcn import GCN, ChebGCN, SimpleTchebconv
 from medigraph.model.baseline import DenseNN, DenseNNSingle
 from medigraph.data.io import Dump
 from pathlib import Path
@@ -112,7 +112,8 @@ def train_multiple_configurations(
                 model = GCN(feat_dim, adj, hdim=hdim, p_dropout=dropout)
             elif "cheb" in model_name.lower():
                 model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout)
-                # model = ChebGCN(feat_dim, 1, adj.cpu().numpy(), K=3, device=device, proba_dropout=dropout, decimate=8)
+            elif "tchb" in model_name.lower():
+                model = SimpleTchebconv(feat_dim, adj)
             elif "dense" in model_name.lower():
                 model = DenseNN(feat_dim, hdim=hdim, p_dropout=dropout)
             elif "single" in model_name.lower():

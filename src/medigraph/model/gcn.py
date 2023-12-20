@@ -11,14 +11,21 @@ class BasicGCNDenseLayer(torch.nn.Module):
     Implemented for dense graphs (no sparse matrix)
     """
 
-    def __init__(self, input_dim, output_dim, normalized_adjacency_matrix: torch.Tensor):
+    def __init__(
+        self, input_dim, output_dim, normalized_adjacency_matrix: torch.Tensor,
+        bias=False,
+        apply_non_linearity=True
+    ):
         super().__init__()
-        self.fc1 = torch.nn.Linear(input_dim, output_dim, bias=False)
+        self.fc1 = torch.nn.Linear(input_dim, output_dim, bias=bias)
         self.adj = normalized_adjacency_matrix
+        self.apply_non_linearity = apply_non_linearity
 
     def forward(self, inp: torch.Tensor):
         x = self.fc1(inp)
         x = self.adj @ x
+        if not self.apply_non_linearity:
+            return x
         x = torch.nn.functional.relu(x)
         return x
 
@@ -26,6 +33,7 @@ class BasicGCNDenseLayer(torch.nn.Module):
 class GCN(torch.nn.Module):
     """Graph Convolutional Network for dense graphs
     """
+    @staticmethod
     def get_normalized_adjacency_matrix(adjacency_matrix: torch.Tensor):
         adj = adjacency_matrix + torch.eye(adjacency_matrix.shape[0], device=adjacency_matrix.device)  # add a self loop
         degree = adj.sum(dim=1)  # Degree of each node
@@ -55,6 +63,52 @@ class GCN(torch.nn.Module):
         x = self.gcn3(x) + x
         x = self.dropout(x)
         logit = self.classifier(x)
+        return logit.squeeze()
+
+
+class Aggregate(torch.nn.Module):
+    def __init__(self, input_dim, output_dim, mat=None):
+        super().__init__()
+        self.fc = torch.nn.Linear(
+            input_dim,
+            output_dim,
+            bias=False,
+            # weight_initializer='glorot'
+        )
+        torch.nn.init.xavier_uniform_(self.fc.weight)
+        self.mat = mat
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.mat is not None:
+            x = self.mat @ x
+        x = self.fc(x)
+        return x
+
+
+class SimpleTchebconv(torch.nn.Module):
+    def __init__(self, input_dim, adjacency: torch.Tensor, output_dim: int = 1, K=3):
+        super().__init__()
+        adj = GCN.get_normalized_adjacency_matrix(adjacency)
+        lap = torch.eye(adj.shape[0], device=adj.device) - adj
+        lambda_max = lap.max()
+        lap /= lambda_max
+        self.t0 = None
+        self.t1 = lap
+        self.t2 = 2*lap@lap - torch.eye(adj.shape[0], device=adj.device)
+        self.t3 = 4*lap@lap@lap - 3*lap
+        self.gcn0 = Aggregate(input_dim, output_dim, self.t0)
+        self.gcn1 = Aggregate(input_dim, output_dim, self.t1)
+        self.gcn2 = Aggregate(input_dim, output_dim, self.t2)
+        self.gcn3 = Aggregate(input_dim, output_dim, self.t3)
+        self.bias = torch.nn.Parameter(torch.zeros(output_dim))
+        # self.chebconv = [self.gcn0, self.gcn1, self.gcn2][:K]
+
+    def forward(self, x: torch.Tensor):
+        # logit = torch.zeros((*x.shape[:-1], 1), device=0)
+        # for module in self.chebconv:
+        #     logit += module(x)
+        logit = self.gcn0(x)+self.gcn1(x)+self.gcn2(x) #+self.gcn3(x)
+        logit += self.bias
         return logit.squeeze()
 
 
@@ -140,7 +194,7 @@ class ChebGCN(torch.nn.Module):
         self.edge_index = self.compute_edge_index()
         self.edge_weight = self.compute_edge_weight()
         self.edge_index = self.edge_index.to(device)
-        
+
         if trim is not None:
             self.edge_index = self.edge_index[:, :trim]
         if decimate is not None:
@@ -163,4 +217,5 @@ class ChebGCN(torch.nn.Module):
     def forward(self, x: torch.tensor):
         x = self.chebconv(x, self.edge_index, self.edge_weight)
         x = F.dropout(x, self.proba_dropout, training=self.training)
+        # One shall not do dropout on a single feature layer!
         return x.squeeze()
