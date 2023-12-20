@@ -34,8 +34,12 @@ class GCN(torch.nn.Module):
     """Graph Convolutional Network for dense graphs
     """
     @staticmethod
-    def get_normalized_adjacency_matrix(adjacency_matrix: torch.Tensor):
-        adj = adjacency_matrix + torch.eye(adjacency_matrix.shape[0], device=adjacency_matrix.device)  # add a self loop
+    def get_normalized_adjacency_matrix(adjacency_matrix: torch.Tensor, add_self_loops=True):
+        if add_self_loops:
+            adj = adjacency_matrix + \
+                torch.eye(adjacency_matrix.shape[0], device=adjacency_matrix.device)  # add a self loop
+        else:
+            adj = adjacency_matrix
         degree = adj.sum(dim=1)  # Degree of each node
         d_inv_sqrt = torch.diag(1./torch.sqrt(degree))  # D^-1/2
         adj = d_inv_sqrt @ adj @ d_inv_sqrt  # D^-1/2 A D^-1/2
@@ -73,42 +77,38 @@ class Aggregate(torch.nn.Module):
             input_dim,
             output_dim,
             bias=False,
-            # weight_initializer='glorot'
         )
         torch.nn.init.xavier_uniform_(self.fc.weight)
         self.mat = mat
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.mat is not None:
-            x = self.mat @ x
-        x = self.fc(x)
-        return x
+            y = self.mat @ x
+        else:
+            y = x
+        y = self.fc(y)
+        return y
 
 
 class SimpleTchebconv(torch.nn.Module):
     def __init__(self, input_dim, adjacency: torch.Tensor, output_dim: int = 1, K=3):
         super().__init__()
-        adj = GCN.get_normalized_adjacency_matrix(adjacency)
+        adj = GCN.get_normalized_adjacency_matrix(adjacency, add_self_loops=False)
         lap = torch.eye(adj.shape[0], device=adj.device) - adj
         lambda_max = lap.max()
         lap /= lambda_max
+        lap -= torch.eye(adj.shape[0], device=adj.device)  # Remove self loop
         self.t0 = None
         self.t1 = lap
-        self.t2 = 2*lap@lap - torch.eye(adj.shape[0], device=adj.device)
-        self.t3 = 4*lap@lap@lap - 3*lap
+        self.t2 = 2.*lap@lap - torch.eye(adj.shape[0], device=adj.device)
+        # self.t3 = 4*lap@lap@lap - 3*lap
         self.gcn0 = Aggregate(input_dim, output_dim, self.t0)
         self.gcn1 = Aggregate(input_dim, output_dim, self.t1)
         self.gcn2 = Aggregate(input_dim, output_dim, self.t2)
-        self.gcn3 = Aggregate(input_dim, output_dim, self.t3)
         self.bias = torch.nn.Parameter(torch.zeros(output_dim))
-        # self.chebconv = [self.gcn0, self.gcn1, self.gcn2][:K]
 
     def forward(self, x: torch.Tensor):
-        # logit = torch.zeros((*x.shape[:-1], 1), device=0)
-        # for module in self.chebconv:
-        #     logit += module(x)
-        logit = self.gcn0(x)+self.gcn1(x)+self.gcn2(x) #+self.gcn3(x)
-        logit += self.bias
+        logit = self.gcn0(x) + self.gcn1(x) + self.gcn2(x) + self.bias
         return logit.squeeze()
 
 
