@@ -34,10 +34,8 @@ Nodes are partially labelled to split the dataset between training (80%), valida
 -----------
 
 
-
------------
 ### Getting started
-
+Create a dedicated environment, use [`requirements.txt`](/requirements.txt)
 ```bash
 git clone git@github.com:balthazarneveu/sprectral_graph_convolutions.git
 cd sprectral_graph_convolutions
@@ -53,11 +51,16 @@ python ABIDE_dataset/download_preprocess.py
 python scripts/train_script.py -n 1000 -f rfe -m Dense Cheb-dr=0.0 -d cuda
 ```
 
+:bulb: *We provide the training curves in the [results](/results) folder so you will be able to plot the curves
+directly without retraining*. If you want to re-train from scratch, just remove the result folder.
+
 ![Training curves](/report/figures/training_curves.png)
 
-Train several models:
-- a baseline Dense fully connected network not taking the graph into consideration
-- ChebConv (Chebconv requires something around 9Gb of GPU memory.)
+Train several models: `-m Dense Cheb`
+- `Dense` a baseline Dense fully connected network not taking the graph into consideration
+- `Cheb` ChebConv (Chebconv requires something around 9Gb of GPU memory when using RFE.). 
+- We have made a custom re-implementation of Chebconv without sparse matrices (use `-m tchb`) *but for some reasons it does not work as well as the Pytorch Geometry*
+
 
 ![performances comparisons](report/figures/model_performances_architecture.png)
 Cross validation is performed on 10 runs using 10 fixed seeds to split the dataset into training (80%), validation (10%) and test set (10%).
@@ -76,24 +79,32 @@ Brain connectivity (Using the HO Altas)
 #### How is the graph built?
 ![](report/figures/spectral_graph_convolution_graph_construction.png)
 
-:bulb: Notebook to get [intuition](studies/graph_convolution_intuition.ipynb)  on what the "graph convolution" aspect is doing:
-Since edges have been built using feature similarity, convolving the graph is equivalent to denoise features the way
-Non Local means would do on an image grid
+Similarity between features is **boosted** when 2 patients have the same gender and acquisition sites.
+If two patients have different gender and acquisition sites, they're simply not linked by an edge.
+
+
 
 ------
 #### :gift: Extra content
 
 ##### Dataset utilities
 - [ABIDE dataset](/ABIDE_dataset/) 
-  - [Utilities to download the dataset](/ABIDE_dataset/download_preprocess.py) *(by Ines Vati)* 
+  - [Utilities to download the dataset](/ABIDE_dataset/download_preprocess.py) *(by Inès Vati)* 
   - [Visualization tools](/ABIDE_dataset/visualize_data.ipynb)  *(by Balthazar Neveu)*
 
 
 ##### Notes on theory and papers 
-- [Graph spectral theory](/notes-on-graph-spectral-theory) note *(by Ines Vati)*
+- [Graph spectral theory](/notes-on-graph-spectral-theory) note *(by Inès Vati)*
 - [Papers analyzis](/notes/) Reading notes on cited papers.
-
+- [What's the graph convolution for?](studies/graph_convolution_intuition.ipynb) 
+:bulb: Notebook to get intuition/analogy on what the "graph convolution" aspect is doing:
+Since edges have been built using feature similarity, convolving the graph is equivalent to denoise features the way
+Non Local means would do on an image grid
 
 ##### Studies
 - [Normalized adjacency matrix](/studies/normalized_adjacency.py) : getting familiar with the $D^{-\frac{1}{2}} A D^{-\frac{1}{2}}$ matrix  *(by  Balthazar Neveu)* based on [NetworkX](https://networkx.org/).
 
+-------
+#### Erratum
+:warning: Do not train ChebConv with dropout, Pytorch geometry does not support dropout in its linear layers. 
+Some figures in the report may be wrong.
