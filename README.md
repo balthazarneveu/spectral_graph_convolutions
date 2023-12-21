@@ -48,8 +48,10 @@ python ABIDE_dataset/download_preprocess.py
 
 #### Training
 ```bash
-python scripts/train_script.py -n 1000 -f rfe -m Dense Cheb-dr=0.1 -d cuda
+python scripts/train_script.py -n 1000 -f rfe -m Dense Cheb-dr=0.0 -d cuda
 ```
+
+![Training curves](/report/figures/training_curves.png)
 
 Train several models:
 - a baseline Dense fully connected network not taking the graph into consideration
