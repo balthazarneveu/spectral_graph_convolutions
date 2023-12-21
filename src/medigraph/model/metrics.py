@@ -111,48 +111,96 @@ def plot_metrics(metric_dict: dict, figsize=(10, 6)) -> None:
         }
         ```
     """
-    fig, axs = plt.subplots(1, 3, figsize=figsize)
+    fig, axs = plt.subplots(1, 4, figsize=figsize)
     colors = ["b", "g", "r", "y", "m", "c", "k"]
     # colors  = [""]
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
         color = colors[idx % len(colors)]
         for seed_idx, seed in enumerate(metric.keys()):
             current_metric = metric[seed]
-            axs[0].plot(current_metric[LOSS][TRAIN], color+"--",
+            axs[0].plot(current_metric[LOSS][TRAIN], color+"-",
+                        alpha=0.2,
                         label=None if seed_idx >= 1 else (model_name + " TRAIN"))
-            axs[0].plot(current_metric[LOSS][VALIDATION], color+"-.",
-                        alpha=0.8,
+            axs[1].plot(current_metric[LOSS][VALIDATION], color+"--",
+                        alpha=0.2,
                         label=None if seed_idx >= 1 else (model_name + " VALIDATION"))
-            axs[0].plot(current_metric[LOSS][TEST], color+"-", linewidth=2,
+            axs[1].plot(current_metric[LOSS][TEST], color+"-", linewidth=2,
+                        alpha=0.2,
                         label=None if seed_idx >= 1 else (model_name + " TEST"))
-            axs[1].plot(current_metric[ACCURACY][TRAIN], color+"--",
+            
+            
+            axs[2].plot(current_metric[ACCURACY][TRAIN], color+"--",
+                        alpha=0.2,
                         label=None if seed_idx >= 1 else (f"{model_name} TRAIN accuracy"))
-            axs[1].plot(current_metric[ACCURACY][VALIDATION], color+"-.",
-                        alpha=0.8,
+            axs[3].plot(current_metric[ACCURACY][VALIDATION], color+"-.",
+                        alpha=0.2,
                         label=None if seed_idx >= 1 else (f"{model_name} VALIDATION accuracy"))
-            axs[2].plot(current_metric[ACCURACY][TEST], color+"-",
+            axs[3].plot(current_metric[ACCURACY][TEST], color+"-",
                         # linewidth=2,
                         alpha=0.1,
                         label=None if seed_idx >= 1 else (f"{model_name} TEST accuracy"))
+    
     for idx, (model_name, metric) in enumerate(metric_dict.items()):
         color = colors[idx % len(colors)]
-        acc_test = np.array([metric[seed][ACCURACY][TEST]for seed in metric.keys()]).mean(axis=0)
+        acc_train = np.array([metric[seed][ACCURACY][TRAIN]for seed in metric.keys()]).mean(axis=0)
         axs[2].plot(
-            acc_test,
+            acc_train,
             color+"-",
             linewidth=3,
             alpha=1.,
+            label=f"{model_name} average TRAIN accuracy")
+        acc_val = np.array([metric[seed][ACCURACY][VALIDATION]for seed in metric.keys()]).mean(axis=0)
+        axs[3].plot(
+            acc_val,
+            color+"-",
+            linewidth=3,
+            alpha=1.,
+            label=f"{model_name} average VALIDATION accuracy")
+        acc_test = np.array([metric[seed][ACCURACY][TEST]for seed in metric.keys()]).mean(axis=0)
+        axs[3].plot(
+            acc_test,
+            color+"--",
+            linewidth=3,
+            alpha=1.,
             label=f"{model_name} average TEST accuracy")
+        loss_train = np.array([metric[seed][LOSS][TRAIN]for seed in metric.keys()]).mean(axis=0)
+        axs[0].plot(
+            loss_train,
+            color+"-",
+            linewidth=3,
+            alpha=1.,
+            label=f"{model_name} average TRAIN loss")
+        loss_valid = np.array([metric[seed][LOSS][VALIDATION]for seed in metric.keys()]).mean(axis=0)
+        axs[1].plot(
+            loss_valid,
+            color+"--",
+            linewidth=3,
+            alpha=1.,
+            label=f"{model_name} average VALIDATION loss")
+        loss_test = np.array([metric[seed][LOSS][TEST]for seed in metric.keys()]).mean(axis=0)
+        axs[1].plot(
+            loss_test,
+            color+"-",
+            linewidth=3,
+            alpha=1.,
+            label=f"{model_name} average TEST loss")
     for ax in axs:
         ax.legend()
         ax.grid()
     axs[0].set_xlabel("Epochs")
     axs[0].set_ylabel("Binary Cross Entropy Loss")
+    axs[0].set_ylim(0, 1.2)
     axs[1].set_xlabel("Epochs")
-    axs[1].set_ylabel("Accuracy")
-    axs[2].set_ylabel("Test accuracy")
-    axs[0].set_title("Losses")
-    axs[1].set_title("Accuracy")
-    axs[2].set_title("Test accuracy")
+    axs[1].set_ylabel("Binary Cross Entropy Loss")
+    axs[1].set_ylim(0, 1.2)
+    axs[2].set_xlabel("Epochs")
+    axs[2].set_ylabel("Train Accuracy")
+    axs[3].set_ylabel("Test/Validation Accuracy")
+    axs[2].set_ylim(0.4, 1.)
+    axs[3].set_ylim(0.4, 1.)
+    axs[0].set_title("Training Losses")
+    axs[1].set_title("Test/Validation Losses")
+    axs[2].set_title("Train Accuracy")
+    axs[3].set_title("Test/Validation accuracy")
 
     plt.show()

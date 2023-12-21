@@ -35,8 +35,9 @@ def main():
         features_selection_list=args.features_selection,
         output_folder=Path(args.output_folder)
     )
-    analyze_metrics(metric_dict, plot_flag=True)
     plot_metrics(metric_dict)
+    analyze_metrics(metric_dict, plot_flag=True, ylim=(0.6, 0.75), grid=True)
+    
 
 
 if __name__ == "__main__":
