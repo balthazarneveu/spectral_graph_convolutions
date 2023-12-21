@@ -6,6 +6,8 @@ We only deal with the ABIDE dataset dedicated to the study of ASD (*autism spect
 
 # :scroll: [Report](/report/87_Ines_VATI_Manal_AKHANNOUSS_Balthazar_NEVEU.pdf)
 
+# :memo: [Slides](/report/slides.pdf)
+
 ## Authors
 - Program: [MVA Master's degree](https://www.master-mva.com/) class on [Geometric Data Analysis](https://www.jeanfeydy.com/Teaching/index.html). ENS Paris-Saclay.
 - Authors
